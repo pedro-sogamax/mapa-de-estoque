@@ -1,0 +1,69 @@
+<!-- Corpo do e-mail em HTML, com a assinatura padrao da Sogamax.
+     A versao em texto puro fica em email.txt, e o assunto tambem vem de la (1a linha).
+     Todo cliente recebe as DUAS versoes: quem nao renderiza HTML le o texto.
+
+     Variaveis: {FABRICANTE} {PERIODO} {COMPRADOR} {CARGO} {TELEFONES} {EMAIL_COMPRADOR} {DATA}
+
+     As imagens sao embutidas na propria mensagem (cid:), nunca baixadas de fora — e como a
+     assinatura do Outlook ja funciona, e o que impede o cliente de bloquear como rastreador.
+     Os arquivos estao em templates/assinatura/; trocar a marca e trocar aqueles arquivos.
+
+     Estilo copiado da assinatura oficial: Verdana 9pt, rotulos em #0099CC, texto #3C3C3B,
+     barra vertical #0099CC separando o logo do texto. Estilos ficam INLINE de proposito:
+     cliente de e-mail ignora <style> no cabecalho. -->
+<div style="font-family: Verdana, sans-serif; font-size: 10pt; color: #000000;">
+  <p>Prezados,</p>
+
+  <p>Segue em anexo o mapa de estoque referente ao per&iacute;odo <b>{PERIODO}</b>.</p>
+
+  <p>Qualquer diverg&ecirc;ncia, favor responder este e-mail.</p>
+
+  <p>Atenciosamente,</p>
+</div>
+
+<table cellspacing="0" cellpadding="0" border="0" width="545"
+       style="width: 408.75pt; font-family: Verdana, sans-serif;">
+  <tr>
+    <td width="145" rowspan="3" valign="top" style="width: 108.75pt; padding: 0 3.75pt 0 0;">
+      <img src="cid:logo" width="132" height="127" alt="Sogamax"
+           style="width: 1.375in; height: 1.325in; display: block;">
+    </td>
+    <td width="400" valign="top"
+        style="width: 300pt; border-left: 1.5pt solid #0099CC; padding: 0 0 3.75pt 3.75pt;">
+      <b style="font-size: 10pt;">{COMPRADOR}</b><br>
+      <span style="font-size: 9pt; color: #3C3C3B;">{CARGO}</span>
+    </td>
+  </tr>
+  <tr>
+    <td width="400" valign="top"
+        style="width: 300pt; border-left: 1.5pt solid #0099CC; padding: 0 0 3.75pt 3.75pt;
+               font-size: 9pt; color: #3C3C3B;">
+      <span style="color: #0099CC;">F:</span> {TELEFONES}<br>
+      <span style="color: #0099CC;">R:</span> Volunt&aacute;rios da P&aacute;tria, 500 - Campos dos Goytacazes /RJ<br>
+      <span style="color: #0099CC;">Email:</span>
+      <a href="mailto:{EMAIL_COMPRADOR}" style="color: #0099CC;">{EMAIL_COMPRADOR}</a>
+    </td>
+  </tr>
+  <tr>
+    <td width="400"
+        style="width: 300pt; border-left: 1.5pt solid #0099CC; padding: 0 0 0 3.75pt;">
+      <a href="https://www.facebook.com/Sogamaxdistribuidora" target="_blank"
+         style="text-decoration: none;"><img src="cid:facebook" width="21" height="21"
+         alt="Facebook" border="0" style="width: .216in; height: .216in;"></a>&nbsp;<a
+         href="https://www.linkedin.com/in/sogamaxdistribuidora/" target="_blank"
+         style="text-decoration: none;"><img src="cid:linkedin" width="21" height="21"
+         alt="LinkedIn" border="0" style="width: .216in; height: .216in;"></a>&nbsp;<a
+         href="https://www.instagram.com/sogamaxdistribuidora/" target="_blank"
+         style="text-decoration: none;"><img src="cid:instagram" width="21" height="21"
+         alt="Instagram" border="0" style="width: .216in; height: .216in;"></a>&nbsp;<a
+         href="https://sogamax.com.br/" target="_blank"
+         style="text-decoration: none;"><img src="cid:site" width="21" height="21"
+         alt="sogamax.com.br" border="0" style="width: .216in; height: .216in;"></a>
+    </td>
+  </tr>
+</table>
+
+<p style="font-family: Verdana, sans-serif; font-size: 8pt; color: #808080; margin-top: 12pt;">
+  Mensagem enviada automaticamente pelo sistema de Mapa de Estoque da Sogamax.
+  As respostas chegam a {COMPRADOR}, no endere&ccedil;o acima.
+</p>

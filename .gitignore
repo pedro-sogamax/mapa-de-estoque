@@ -1,0 +1,27 @@
+# Credenciais e sessao autenticada — nunca versionar
+.env
+.auth/
+
+# Gravacoes do "playwright codegen": contem a senha digitada em texto puro
+gravacao*.py
+
+# Saida do script
+downloads/
+formatado/
+logs/
+sequencia.json
+estado.json
+envios/
+envios.json
+ultima-rodada.json
+
+# Python
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+*.egg-info/
+
+# Playwright
+test-results/
+playwright-report/

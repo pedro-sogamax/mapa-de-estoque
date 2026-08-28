@@ -1,0 +1,21 @@
+Mapa de Estoque — Sogamax — {FABRICANTE} — {PERIODO}
+
+Prezados,
+
+Segue em anexo o mapa de estoque referente ao período {PERIODO}.
+
+Qualquer divergência, favor responder este e-mail.
+
+Atenciosamente,
+
+{COMPRADOR}
+{CARGO}
+F: {TELEFONES}
+R: Voluntários da Pátria, 500 - Campos dos Goytacazes /RJ
+Email: {EMAIL_COMPRADOR}
+
+Sogamax Distribuidora
+https://sogamax.com.br/
+
+Mensagem enviada automaticamente pelo sistema de Mapa de Estoque da Sogamax.
+As respostas chegam a {COMPRADOR}, no endereço acima.
