@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import logging
 import os
 import re
 from dataclasses import dataclass, field
@@ -11,6 +12,8 @@ import yaml
 from dotenv import load_dotenv
 
 from src.periodo import DIAS_SEMANA, JANELAS_SEMANAIS, normalizar_dia
+
+log = logging.getLogger(__name__)
 
 RAIZ_PROJETO = Path(__file__).resolve().parent.parent
 
@@ -383,82 +386,139 @@ def carregar_config(headless_override: bool | None = None) -> Config:
     )
 
 
-def carregar_fabricantes(caminho: Path | None = None) -> list[Fabricante]:
-    """Le fabricantes.yaml e devolve apenas os marcados como ativos."""
+def _ler_fabricante(item: object, indice: int, arquivo: str) -> Fabricante:
+    """Le e valida UMA entrada do fabricantes.yaml. Levanta no primeiro erro que encontrar.
+
+    Extraido do laco para que uma entrada malformada possa ser descartada sozinha, sem
+    levar junto o cadastro inteiro — veja carregar_fabricantes_com_problemas.
+    """
+    if not isinstance(item, dict) or not item.get("nome"):
+        raise ConfiguracaoInvalida(f"Item {indice} de {arquivo} precisa ter o campo 'nome'.")
+    nome = str(item["nome"]).strip()
+
+    bruto = item.get("codigos", item.get("codigo"))
+    if not bruto:
+        raise ConfiguracaoInvalida(
+            f"Fabricante {nome!r} em {arquivo} precisa de 'codigo' ou 'codigos' "
+            "(os codigos do Geweb, ex.: 13963). Veja logs/fabricantes-geweb.txt."
+        )
+    # str() porque o YAML le 13963 como numero, e a busca no Geweb e textual.
+    codigos = [str(bruto).strip()] if not isinstance(bruto, list) else [str(c).strip() for c in bruto]
+
+    if "periodicidade" in item:
+        raise ConfiguracaoInvalida(
+            f"Fabricante {nome!r}: o campo 'periodicidade' foi substituido. "
+            "Use 'mensal: true/false' e 'dias_semana: [segunda, quarta]' — um fabricante "
+            "pode receber os dois envios. Veja os comentarios no topo do fabricantes.yaml."
+        )
+
+    dias_brutos = item.get("dias_semana") or []
+    if not isinstance(dias_brutos, list):
+        dias_brutos = [dias_brutos]
+    dias: list[str] = []
+    for bruto_dia in dias_brutos:
+        dia = normalizar_dia(bruto_dia)
+        if dia not in DIAS_SEMANA:
+            raise ConfiguracaoInvalida(
+                f"Fabricante {nome!r}: dia {bruto_dia!r} invalido. "
+                f"Use um de: {', '.join(DIAS_SEMANA)}."
+            )
+        if dia not in dias:  # o mesmo dia duas vezes geraria o relatorio em duplicata
+            dias.append(dia)
+    # Ordena pelo dia da semana, nao pela ordem digitada — o plano do dia fica legivel.
+    dias.sort(key=lambda d: DIAS_SEMANA[d])
+
+    janela = str(item.get("janela_semanal", "acumulado_mes")).strip().lower()
+    if janela not in JANELAS_SEMANAIS:
+        raise ConfiguracaoInvalida(
+            f"Fabricante {nome!r}: janela_semanal {janela!r} invalida. "
+            f"Use uma de: {', '.join(JANELAS_SEMANAIS)}."
+        )
+
+    mensal = bool(item.get("mensal", True))
+    if not mensal and not dias:
+        raise ConfiguracaoInvalida(
+            f"Fabricante {nome!r} nao tem nenhum envio: defina 'mensal: true' "
+            "ou informe 'dias_semana'. Para desligar o fabricante use 'ativo: false'."
+        )
+
+    return Fabricante(
+        nome=nome,
+        codigos=tuple(c for c in codigos if c),
+        mensal=mensal,
+        dias_semana=tuple(dias),
+        janela_semanal=janela,
+        ativo=bool(item.get("ativo", True)),
+        contatos=_ler_contatos(item, nome),
+        comprador=_ler_comprador(item, nome),
+    )
+
+
+def carregar_fabricantes_com_problemas(
+    caminho: Path | None = None,
+) -> tuple[list[Fabricante], list[str]]:
+    """Le fabricantes.yaml. Devolve (fabricantes ativos e validos, problemas encontrados).
+
+    Um fabricante malformado e DESCARTADO com erro no log, e a rodada segue com os demais.
+
+    Abortar tudo no primeiro erro era adequado enquanto so o TI editava este arquivo e via
+    a mensagem na hora, na propria tela. Com o cadastro na mao do comprador o calculo muda:
+    um e-mail digitado errado as 18h faria a rodada das 07:00 nao gerar NADA para os 23
+    laboratorios — e em silencio, porque nao ha alerta ativo, so um codigo de saida no log
+    do agendador que ninguem le. Perder um laboratorio e um problema visivel e localizado;
+    perder a rodada inteira nao e nenhum dos dois.
+
+    Continua abortando o que nao da para isolar: arquivo ausente, YAML malformado (nao ha
+    entrada aproveitavel) ou nenhum fabricante valido restante.
+    """
     arquivo = caminho or RAIZ_PROJETO / "fabricantes.yaml"
     if not arquivo.exists():
         raise ConfiguracaoInvalida(f"Arquivo de fabricantes nao encontrado: {arquivo}")
 
-    dados = yaml.safe_load(arquivo.read_text(encoding="utf-8")) or {}
+    try:
+        dados = yaml.safe_load(arquivo.read_text(encoding="utf-8")) or {}
+    except yaml.YAMLError as erro:
+        # A mensagem crua do parser aponta linha e coluna, o que e util, mas sozinha nao
+        # diz o que fazer. Um TAB no lugar de espacos e o erro mais comum de quem edita
+        # YAML a mao pela primeira vez.
+        raise ConfiguracaoInvalida(
+            f"{arquivo.name} nao e um YAML valido e nao pode ser lido:\n{erro}\n"
+            "Confira a indentacao (espacos, nunca TAB) e as aspas da linha indicada."
+        ) from erro
+
     itens = dados.get("fabricantes")
     if not isinstance(itens, list) or not itens:
-        raise ConfiguracaoInvalida(f"{arquivo.name} precisa conter uma lista nao vazia em 'fabricantes'.")
+        raise ConfiguracaoInvalida(
+            f"{arquivo.name} precisa conter uma lista nao vazia em 'fabricantes'."
+        )
 
     fabricantes: list[Fabricante] = []
+    problemas: list[str] = []
     for indice, item in enumerate(itens, start=1):
-        if not isinstance(item, dict) or not item.get("nome"):
-            raise ConfiguracaoInvalida(f"Item {indice} de {arquivo.name} precisa ter o campo 'nome'.")
-        nome = str(item["nome"]).strip()
-        bruto = item.get("codigos", item.get("codigo"))
-        if not bruto:
-            raise ConfiguracaoInvalida(
-                f"Fabricante {nome!r} em {arquivo.name} precisa de 'codigo' ou 'codigos' "
-                "(os codigos do Geweb, ex.: 13963). Veja logs/fabricantes-geweb.txt."
-            )
-        # str() porque o YAML le 13963 como numero, e a busca no Geweb e textual.
-        codigos = [str(bruto).strip()] if not isinstance(bruto, list) else [str(c).strip() for c in bruto]
-
-        if "periodicidade" in item:
-            raise ConfiguracaoInvalida(
-                f"Fabricante {nome!r}: o campo 'periodicidade' foi substituido. "
-                "Use 'mensal: true/false' e 'dias_semana: [segunda, quarta]' — um fabricante "
-                "pode receber os dois envios. Veja os comentarios no topo do fabricantes.yaml."
-            )
-
-        dias_brutos = item.get("dias_semana") or []
-        if not isinstance(dias_brutos, list):
-            dias_brutos = [dias_brutos]
-        dias: list[str] = []
-        for bruto_dia in dias_brutos:
-            dia = normalizar_dia(bruto_dia)
-            if dia not in DIAS_SEMANA:
-                raise ConfiguracaoInvalida(
-                    f"Fabricante {nome!r}: dia {bruto_dia!r} invalido. "
-                    f"Use um de: {', '.join(DIAS_SEMANA)}."
-                )
-            if dia not in dias:  # o mesmo dia duas vezes geraria o relatorio em duplicata
-                dias.append(dia)
-        # Ordena pelo dia da semana, nao pela ordem digitada — o plano do dia fica legivel.
-        dias.sort(key=lambda d: DIAS_SEMANA[d])
-
-        janela = str(item.get("janela_semanal", "acumulado_mes")).strip().lower()
-        if janela not in JANELAS_SEMANAIS:
-            raise ConfiguracaoInvalida(
-                f"Fabricante {nome!r}: janela_semanal {janela!r} invalida. "
-                f"Use uma de: {', '.join(JANELAS_SEMANAIS)}."
-            )
-
-        mensal = bool(item.get("mensal", True))
-        if not mensal and not dias:
-            raise ConfiguracaoInvalida(
-                f"Fabricante {nome!r} nao tem nenhum envio: defina 'mensal: true' "
-                "ou informe 'dias_semana'. Para desligar o fabricante use 'ativo: false'."
-            )
-
-        fabricantes.append(
-            Fabricante(
-                nome=nome,
-                codigos=tuple(c for c in codigos if c),
-                mensal=mensal,
-                dias_semana=tuple(dias),
-                janela_semanal=janela,
-                ativo=bool(item.get("ativo", True)),
-                contatos=_ler_contatos(item, nome),
-                comprador=_ler_comprador(item, nome),
-            )
-        )
+        try:
+            fabricantes.append(_ler_fabricante(item, indice, arquivo.name))
+        except ConfiguracaoInvalida as erro:
+            problemas.append(str(erro))
+            log.error("CADASTRO IGNORADO: %s", erro)
 
     ativos = [f for f in fabricantes if f.ativo]
     if not ativos:
-        raise ConfiguracaoInvalida(f"Nenhum fabricante ativo em {arquivo.name}.")
-    return ativos
+        # Sem nenhum fabricante nao ha rodada nenhuma: aqui a falha total e o desfecho
+        # correto, e os problemas acumulados entram na mensagem para nao se perderem.
+        detalhe = ("\n  - " + "\n  - ".join(problemas)) if problemas else ""
+        raise ConfiguracaoInvalida(f"Nenhum fabricante ativo em {arquivo.name}.{detalhe}")
+
+    if problemas:
+        log.error(
+            "%d fabricante(s) ficaram DE FORA da rodada por erro de cadastro. "
+            "Seguindo com os %d validos — corrija o %s.",
+            len(problemas),
+            len(ativos),
+            arquivo.name,
+        )
+    return ativos, problemas
+
+
+def carregar_fabricantes(caminho: Path | None = None) -> list[Fabricante]:
+    """Le fabricantes.yaml e devolve apenas os fabricantes ativos e validos."""
+    return carregar_fabricantes_com_problemas(caminho)[0]

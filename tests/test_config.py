@@ -13,7 +13,12 @@ import textwrap
 
 import pytest
 
-from src.config import Contatos, ConfiguracaoInvalida, carregar_fabricantes
+from src.config import (
+    ConfiguracaoInvalida,
+    Contatos,
+    carregar_fabricantes,
+    carregar_fabricantes_com_problemas,
+)
 
 MINIMO = """
 fabricantes:
@@ -386,6 +391,89 @@ class TestResumoEnvio:
             """,
         )
         assert f.resumo_envio == "mensal semanal(segunda+quarta)"
+
+
+class TestUmErroNaoDerrubaARodada:
+    """O comprador vai editar este arquivo. Um erro dele nao pode custar os 23 laboratorios.
+
+    Antes, `carregar_fabricantes` abortava no primeiro erro e a rodada das 07:00 nao gerava
+    nada — em silencio, porque nao ha alerta ativo. Agora o fabricante com problema fica de
+    fora e os demais seguem.
+    """
+
+    DOIS = """
+    fabricantes:
+      - nome: BOM
+        codigo: 1
+        contatos:
+          emails: [contato@lab.com.br]
+      - nome: RUIM
+        codigo: 2
+        contatos:
+          emails: [sem-arroba]
+    """
+
+    def test_o_valido_sobrevive_ao_invalido(self, tmp_path):
+        assert [f.nome for f in carregar(tmp_path, self.DOIS)] == ["BOM"]
+
+    def test_o_problema_e_reportado_e_nomeia_o_fabricante(self, tmp_path):
+        fabricantes, problemas = carregar_fabricantes_com_problemas(
+            escrever(tmp_path, self.DOIS)
+        )
+        assert [f.nome for f in fabricantes] == ["BOM"]
+        assert len(problemas) == 1
+        assert "RUIM" in problemas[0]
+
+    def test_cadastro_sem_erro_nao_reporta_problema(self, tmp_path):
+        _, problemas = carregar_fabricantes_com_problemas(escrever(tmp_path, MINIMO))
+        assert problemas == []
+
+    def test_erro_e_registrado_no_log_como_error(self, tmp_path, caplog):
+        """Ficar de fora em silencio seria pior que abortar: precisa gritar no log."""
+        with caplog.at_level("ERROR"):
+            carregar(tmp_path, self.DOIS)
+        assert any("RUIM" in r.getMessage() for r in caplog.records)
+
+    def test_varios_invalidos_sao_todos_reportados(self, tmp_path):
+        _, problemas = carregar_fabricantes_com_problemas(
+            escrever(
+                tmp_path,
+                """
+                fabricantes:
+                  - nome: BOM
+                    codigo: 1
+                  - nome: SEM_CODIGO
+                  - nome: DIA_RUIM
+                    codigo: 3
+                    dias_semana: [sabado]
+                """,
+            )
+        )
+        assert len(problemas) == 2
+
+    def test_ainda_aborta_quando_nao_sobra_ninguem(self, tmp_path):
+        """Sem nenhum fabricante nao ha rodada: a falha total e o desfecho correto,
+        e a mensagem precisa carregar os problemas para nao se perderem."""
+        with pytest.raises(ConfiguracaoInvalida) as erro:
+            carregar(
+                tmp_path,
+                """
+                fabricantes:
+                  - nome: RUIM
+                    codigo: 1
+                    contatos:
+                      emails: [sem-arroba]
+                """,
+            )
+        assert "sem-arroba" in str(erro.value)
+
+    def test_yaml_malformado_aborta_com_mensagem_util(self, tmp_path):
+        """Um YAML quebrado nao tem entrada aproveitavel — nao da para isolar o estrago.
+        TAB no lugar de espacos e o erro mais comum de quem edita YAML a mao."""
+        arquivo = tmp_path / "fabricantes.yaml"
+        arquivo.write_text("fabricantes:\n\t- nome: ACHE\n", encoding="utf-8")
+        with pytest.raises(ConfiguracaoInvalida, match="indentacao"):
+            carregar_fabricantes(arquivo)
 
 
 class TestCadastroReal:
