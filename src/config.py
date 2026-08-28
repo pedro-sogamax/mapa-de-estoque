@@ -55,6 +55,7 @@ class Config:
     remetente: str
     responder_para: str
     destinatario_teste: tuple[str, ...]
+    alerta_para: tuple[str, ...]
     telefone_teste: str
     smtp_host: str
     smtp_porta: int
@@ -93,6 +94,21 @@ class Config:
     def em_teste(self) -> bool:
         """Alguma trava de teste esta ligada — nenhuma industria sera tocada nesse canal."""
         return bool(self.destinatario_teste or self.telefone_teste)
+
+    @property
+    def alerta_destinatarios(self) -> tuple[str, ...]:
+        """Quem recebe o aviso de falha da rodada, com dois padroes em cascata.
+
+        Sem ALERTA_PARA vale o RESPONDER_PARA (quem acompanha os mapas); sem ele, a propria
+        caixa que envia — que ao menos existe e e lida. Um alerta que nao chega a ninguem
+        so seria descoberto no dia em que fizesse falta.
+        """
+        if self.alerta_para:
+            return self.alerta_para
+        if self.responder_para:
+            brutos = self.responder_para.replace(";", ",").split(",")
+            return tuple(e for bruto in brutos if (e := bruto.strip()))
+        return (self.smtp_usuario,) if self.smtp_usuario else ()
 
 
 @dataclass(frozen=True)
@@ -278,6 +294,22 @@ def _ler_int(chave: str, padrao: int) -> int:
         raise ConfiguracaoInvalida(f"{chave} deve ser um numero inteiro, recebido: {bruto!r}") from erro
 
 
+def _enderecos(chave: str) -> tuple[str, ...]:
+    """Le uma variavel com um ou mais e-mails separados por virgula (ou ponto e virgula).
+
+    Um typo aqui nao daria erro nenhum na hora: as mensagens simplesmente iriam para um
+    endereco que nao existe. Barato conferir, caro descobrir tarde.
+    """
+    brutos = os.getenv(chave, "").replace(";", ",").split(",")
+    enderecos = tuple(e for bruto in brutos if (e := bruto.strip()))
+    for endereco in enderecos:
+        if "@" not in endereco or endereco.startswith("@") or endereco.endswith("@"):
+            raise ConfiguracaoInvalida(
+                f"{chave} tem endereco invalido: {endereco!r}. Separe varios por virgula."
+            )
+    return enderecos
+
+
 def _ler_obrigatorio(chave: str) -> str:
     valor = os.getenv(chave, "").strip()
     if not valor:
@@ -306,31 +338,21 @@ def carregar_config(headless_override: bool | None = None) -> Config:
             f"SMTP_SEGURANCA={seguranca!r} invalido. Use 'starttls' (porta 587) ou 'ssl' (porta 465)."
         )
 
-    # Um typo aqui nao daria erro nenhum: as respostas das industrias simplesmente iriam
-    # para um endereco que nao existe. Barato conferir, caro descobrir tarde.
+    # Para onde a industria responde. Continua como texto porque vai direto no header
+    # Reply-To; a chamada abaixo existe pela validacao.
     responder_para = os.getenv("RESPONDER_PARA", "").strip()
-    for endereco in responder_para.replace(";", ",").split(","):
-        endereco = endereco.strip()
-        if endereco and ("@" not in endereco or endereco.startswith("@") or endereco.endswith("@")):
-            raise ConfiguracaoInvalida(
-                f"RESPONDER_PARA tem endereco invalido: {endereco!r}. "
-                "Separe varios por virgula."
-            )
+    _enderecos("RESPONDER_PARA")
 
     # A trava de e-mail aceita mais de um endereco. Homologar quase sempre envolve mais de
     # uma pessoa — o comprador precisa ver o que a industria veria — e a alternativa seria
     # desligar a trava para conseguir isso, que e exatamente o que ela existe para evitar.
-    destinatario_teste = tuple(
-        endereco
-        for bruto in os.getenv("DESTINATARIO_TESTE", "").replace(";", ",").split(",")
-        if (endereco := bruto.strip())
-    )
-    for endereco in destinatario_teste:
-        if "@" not in endereco or endereco.startswith("@") or endereco.endswith("@"):
-            raise ConfiguracaoInvalida(
-                f"DESTINATARIO_TESTE tem endereco invalido: {endereco!r}. "
-                "Separe varios por virgula."
-            )
+    destinatario_teste = _enderecos("DESTINATARIO_TESTE")
+
+    # Quem e avisado quando a rodada falha. Vazio nao desliga o alerta: ele cai no
+    # RESPONDER_PARA e, na falta dele, na propria caixa que envia (veja
+    # Config.alerta_destinatarios). Um alerta sem destino por esquecimento seria o mesmo
+    # que nao ter alerta nenhum — e so se descobre no dia em que ele era necessario.
+    alerta_para = _enderecos("ALERTA_PARA")
 
     telefone_teste = os.getenv("TELEFONE_TESTE", "").strip()
     if telefone_teste and not _E164.match(telefone_teste):
@@ -364,6 +386,7 @@ def carregar_config(headless_override: bool | None = None) -> Config:
         remetente=os.getenv("REMETENTE", "").strip(),
         responder_para=responder_para,
         destinatario_teste=destinatario_teste,
+        alerta_para=alerta_para,
         telefone_teste=telefone_teste,
         smtp_host=os.getenv("SMTP_HOST", "").strip(),
         smtp_porta=_ler_int("SMTP_PORTA", 587),

@@ -27,15 +27,17 @@ import re
 import subprocess
 import sys
 from dataclasses import dataclass
+from datetime import date
 from pathlib import Path
 
+from src import alerta
 from src.agenda import Tarefa, tarefas_com_periodo_fixo, tarefas_do_dia
 from src.config import (
     RAIZ_PROJETO,
     Config,
     ConfiguracaoInvalida,
     carregar_config,
-    carregar_fabricantes,
+    carregar_fabricantes_com_problemas,
 )
 from src.estado import EstadoDaAgenda
 from src.formatador import caminho_formatado, formatar
@@ -320,18 +322,79 @@ def _parsear_argumentos(argv: list[str] | None = None) -> argparse.Namespace:
     return parser.parse_args(argv)
 
 
+def _linhas_do_alerta(
+    resultados: list[Resultado],
+    problemas_de_cadastro: list[str],
+    codigo_envio: int | None = None,
+    erro_geral: str = "",
+) -> list[str]:
+    """Corpo do alerta: o que falhou, nomeado, e o que ficou pendente. Uma tela, no maximo."""
+    linhas: list[str] = []
+
+    if erro_geral:
+        linhas += ["A rodada foi interrompida e NENHUM relatorio foi gerado:", f"  {erro_geral}", ""]
+
+    falhas = [r for r in resultados if not r.ok]
+    if falhas:
+        linhas.append(f"{len(falhas)} de {len(resultados)} relatorio(s) NAO sairam:")
+        linhas += [f"  {r.fabricante} ({r.motivo}, {r.periodo}): {r.erro}" for r in falhas]
+        linhas.append("")
+
+    sem_formatar = [r for r in resultados if r.aviso]
+    if sem_formatar:
+        linhas.append(
+            f"{len(sem_formatar)} sairam so no formato bruto do Geweb (formate a mao antes de enviar):"
+        )
+        linhas += [f"  {r.fabricante}: {r.aviso}" for r in sem_formatar]
+        linhas.append("")
+
+    if problemas_de_cadastro:
+        linhas.append(
+            f"{len(problemas_de_cadastro)} fabricante(s) ficaram DE FORA por erro no "
+            "fabricantes.yaml — nao receberam nada:"
+        )
+        linhas += [f"  {p}" for p in problemas_de_cadastro]
+        linhas.append("")
+
+    if codigo_envio:
+        linhas += [
+            f"O envio por e-mail terminou com codigo {codigo_envio} — algum laboratorio "
+            "pode nao ter recebido.",
+            "Confira logs/disparo.log e, se preciso, rode `python -m src.disparo`.",
+            "",
+        ]
+
+    return linhas
+
+
 def main(argv: list[str] | None = None) -> int:
     args = _parsear_argumentos(argv)
     _configurar_log(logging.DEBUG if args.debug else logging.INFO)
 
     try:
         cfg = carregar_config(headless_override=args.headless)
-        fabricantes = carregar_fabricantes()
+        fabricantes, problemas_de_cadastro = carregar_fabricantes_com_problemas()
         periodo = resolver_periodo(args.mes, args.inicio, args.fim)
         hoje = parsear_data(args.hoje, "--hoje") if args.hoje else None
     except (ConfiguracaoInvalida, PeriodoInvalido) as erro:
+        # Aqui ainda nao ha Config utilizavel — pode ser justamente o .env que esta quebrado —
+        # entao nao ha como avisar por e-mail. Fica o log e o codigo de saida.
         log.error("%s", erro)
         return 2
+
+    def avisar(codigo: int, resultados: list[Resultado], envio: int | None = None, erro: str = "") -> None:
+        """Manda o alerta quando a rodada nao terminou limpa. Nunca derruba nada."""
+        if args.planejar:
+            return
+        linhas = _linhas_do_alerta(resultados, problemas_de_cadastro, envio, erro)
+        if not linhas:
+            return
+        quantas = len([r for r in resultados if not r.ok]) or len(problemas_de_cadastro)
+        assunto = (
+            f"[Mapa de Estoque] FALHA na rodada de {date.today():%d/%m/%Y}"
+            f" — {quantas} pendencia(s), codigo {codigo}"
+        )
+        alerta.enviar(cfg, assunto, linhas)
 
     if args.fabricante:
         alvo = args.fabricante.strip().casefold()
@@ -359,16 +422,21 @@ def main(argv: list[str] | None = None) -> int:
         return 0
     if not tarefas:
         log.info("Nada a fazer hoje — o Geweb nem sera aberto.")
+        # Um cadastro quebrado precisa ser avisado mesmo num dia sem extracao: e justamente
+        # o dia em que ninguem olharia o log.
+        avisar(0, [])
         return 0
 
     try:
         resultados = extrair_todos(cfg, tarefas, estado)
     except SeletoresIncompletos as erro:
         log.error("%s", erro)
+        avisar(2, [], erro=str(erro))
         return 2
     except Exception as erro:  # falha de sessao/login: nada foi extraido
         log.error("Execucao interrompida: %s", erro)
         log.debug("Detalhe", exc_info=True)
+        avisar(1, [], erro=str(erro))
         return 1
 
     itens = _registrar_rodada(cfg, resultados)
@@ -376,15 +444,18 @@ def main(argv: list[str] | None = None) -> int:
     codigo = 0 if all(r.ok for r in resultados) else 1
 
     if not args.enviar:
+        avisar(codigo, resultados)
         return codigo
     if not itens:
         # Todos falharam: nao ha anexo nenhum. Chamar o disparo aqui so o faria reler o
         # manifesto da rodada anterior — que o envios.json ja marcou como entregue.
         log.info("Nada extraido nesta rodada — o envio nao foi chamado.")
+        avisar(codigo, resultados)
         return codigo
 
     codigo_envio = _disparar_email(len(itens))
     if codigo_envio == 0:
+        avisar(codigo, resultados)
         return codigo
     if codigo != 0:
         # Os dois falharam. O 3 prevalece porque e o desfecho mais tardio e o mais caro de
@@ -396,6 +467,7 @@ def main(argv: list[str] | None = None) -> int:
             codigo_envio,
             codigo_envio,
         )
+    avisar(codigo_envio, resultados, envio=codigo_envio)
     return codigo_envio
 
 
