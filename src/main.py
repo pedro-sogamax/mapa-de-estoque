@@ -42,6 +42,7 @@ from src.formatador import caminho_formatado, formatar
 from src.geweb.relatorio_page import RelatorioComprasVendas, RelatorioSemDados
 from src.geweb.seletores import SeletoresIncompletos
 from src.geweb.session import sessao_geweb
+from src.log import configurar as configurar_log
 from src.periodo import PeriodoInvalido, parsear_data, resolver_periodo
 from src.rodada import ItemDaRodada
 from src.rodada import gravar as gravar_rodada
@@ -81,17 +82,7 @@ def _nome_de_pasta(nome: str) -> str:
 
 
 def _configurar_log(nivel: int = logging.INFO) -> None:
-    pasta = RAIZ_PROJETO / "logs"
-    pasta.mkdir(parents=True, exist_ok=True)
-    formato = "%(asctime)s %(levelname)-7s %(message)s"
-    logging.basicConfig(
-        level=nivel,
-        format=formato,
-        handlers=[
-            logging.StreamHandler(sys.stdout),
-            logging.FileHandler(pasta / "execucao.log", encoding="utf-8"),
-        ],
-    )
+    configurar_log("execucao.log", nivel)
 
 
 def _formatar(arquivo: Path, cfg: Config) -> tuple[Path | None, str | None]:

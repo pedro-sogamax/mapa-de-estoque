@@ -22,6 +22,7 @@ from playwright.sync_api import Error as PlaywrightError, Page
 from src.config import RAIZ_PROJETO, carregar_config
 from src.geweb import seletores
 from src.geweb.session import sessao_geweb
+from src.log import configurar as configurar_log
 
 log = logging.getLogger("descobrir")
 
@@ -140,15 +141,9 @@ _JS_INPUTS = """
 
 
 def _configurar_log() -> Path:
-    destino = RAIZ_PROJETO / "logs" / "descoberta.log"
-    destino.parent.mkdir(parents=True, exist_ok=True)
-    destino.unlink(missing_ok=True)
-    logging.basicConfig(
-        level=logging.INFO,
-        format="%(message)s",
-        handlers=[logging.StreamHandler(), logging.FileHandler(destino, encoding="utf-8")],
-    )
-    return destino
+    # reiniciar=True: a descoberta e um diagnostico da tela ATUAL do Geweb — o historico
+    # de execucoes anteriores so atrapalharia a leitura.
+    return configurar_log("descoberta.log", formato="%(message)s", reiniciar=True)
 
 
 def _titulo(texto: str) -> None:

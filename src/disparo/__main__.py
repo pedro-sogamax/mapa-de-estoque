@@ -24,14 +24,12 @@ from __future__ import annotations
 
 import argparse
 import logging
-import sys
 import time
 from dataclasses import dataclass
 from datetime import date
 from pathlib import Path
 
 from src.config import (
-    RAIZ_PROJETO,
     Comprador,
     Config,
     ConfiguracaoInvalida,
@@ -48,6 +46,7 @@ from src.disparo.limites import CotaDeEnvio, Disjuntor, LimiteAtingido, conferir
 from src.disparo.mensagem import TemplateInvalido, para_email, para_whatsapp
 from src.disparo.registro import RegistroDeEnvios, RegistroIlegivel
 from src.disparo.selecao import da_ultima_rodada, do_periodo, periodos_disponiveis
+from src.log import configurar as configurar_log
 from src.rodada import ItemDaRodada
 
 log = logging.getLogger("disparo")
@@ -74,16 +73,7 @@ class Passo:
 
 
 def _configurar_log(nivel: int = logging.INFO) -> None:
-    pasta = RAIZ_PROJETO / "logs"
-    pasta.mkdir(parents=True, exist_ok=True)
-    logging.basicConfig(
-        level=nivel,
-        format="%(asctime)s %(levelname)-7s %(message)s",
-        handlers=[
-            logging.StreamHandler(sys.stdout),
-            logging.FileHandler(pasta / "disparo.log", encoding="utf-8"),
-        ],
-    )
+    configurar_log("disparo.log", nivel)
 
 
 def _destino(
