@@ -148,6 +148,14 @@ MENSAGEM_SEM_DADOS: str | None = None
 
 Serve para distinguir "relatorio vazio" de "script travou". Opcional — preencha se
 aparecer uma mensagem desse tipo em algum fabricante sem movimento no periodo.
+
+Enquanto estiver None, um fabricante sem movimento faz a rodada esperar o
+TIMEOUT_RELATORIO_MS inteiro (180s por padrao) e terminar em FalhaNaGeracao, indistinguivel
+de um defeito de verdade. O laboratorio simplesmente nao recebe naquele dia, e a mensagem de
+erro em relatorio_page.py lista essa possibilidade primeiro justamente por isso.
+
+Para preencher: rode a extracao desse fabricante com HEADLESS=false, veja o que a tela
+mostra depois do Gerar e traga o seletor da mensagem para ca.
 """
 
 

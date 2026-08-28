@@ -26,7 +26,7 @@ copy .env.example .env
 notepad .env
 ```
 
-São vinte e sete chaves, lidas por [src/config.py](src/config.py):
+São vinte e oito chaves, lidas por [src/config.py](src/config.py):
 
 | Variável | Obrigatória | Padrão | Para que serve |
 |---|---|---|---|
@@ -45,6 +45,7 @@ São vinte e sete chaves, lidas por [src/config.py](src/config.py):
 | `RESPONDER_PARA` | não | vazio | `Reply-To`, quando a resposta deve ir para outra caixa |
 | `DESTINATARIO_TESTE` | não | vazio | **Trava de teste do e-mail**: preenchido, manda tudo para esse endereço. Aceita vários, separados por vírgula |
 | `TELEFONE_TESTE` | não | vazio | **Trava de teste do WhatsApp** — independente da de e-mail |
+| `ALERTA_PARA` | não | vazio | Quem recebe o **aviso de falha** da rodada. Vazio não desliga: cai no `RESPONDER_PARA` e, na falta dele, na própria caixa que envia |
 | `SMTP_HOST` / `SMTP_PORTA` | não | `smtp.locaweb.com.br` / `587` | Servidor de envio |
 | `SMTP_SEGURANCA` | não | `starttls` | `starttls` (587) ou `ssl` (465) |
 | `SMTP_USUARIO` / `SMTP_SENHA` | para enviar | — | Caixa que envia. Sem elas o canal de e-mail é pulado |
@@ -198,11 +199,18 @@ Dois outros campos completam o cadastro:
 | Campo | Efeito |
 |---|---|
 | `ativo: false` | Pula o fabricante sem tirá-lo da lista — é assim que se desliga um envio |
-| `mensal: false` | Só o semanal. **Exige `dias_semana`** — sem ele o fabricante não teria envio nenhum, e a rodada para com código 2 |
+| `mensal: false` | Só o semanal. **Exige `dias_semana`** — sem ele o fabricante não teria envio nenhum, e fica de fora da rodada |
 
-`dias_semana` aceita **apenas segunda a sexta** — um sábado ou domingo no cadastro derruba a
-rodada com código 2. A grafia é livre: `TERÇA-FEIRA`, `Terça` e `terca` são o mesmo dia, e o
+`dias_semana` aceita **apenas segunda a sexta** — um sábado ou domingo no cadastro tira esse
+fabricante da rodada. A grafia é livre: `TERÇA-FEIRA`, `Terça` e `terca` são o mesmo dia, e o
 dia repetido é ignorado em vez de gerar o relatório duas vezes.
+
+> **Um erro de cadastro não derruba mais a rodada inteira.** O fabricante com problema fica
+> de fora, com `CADASTRO IGNORADO` no log e um e-mail para o `ALERTA_PARA`; os demais rodam
+> normalmente. Antes, o primeiro erro fazia a rodada sair com código 2 sem gerar nada — o que
+> bastava enquanto só o TI editava este arquivo e via a mensagem na hora, mas custaria os 23
+> laboratórios se um e-mail fosse digitado errado às 18h. A rodada só para com código 2 se o
+> YAML estiver ilegível ou se **nenhum** fabricante sobrar válido.
 
 **Confira a agenda antes de rodar de verdade** — `--planejar` mostra o plano sem tocar no
 Geweb, e `--hoje` simula outra data:
@@ -355,7 +363,7 @@ Códigos de saída:
 |---|---|
 | `0` | Tudo certo — inclusive o dia sem envio e o `--planejar` |
 | `1` | Algum fabricante falhou, ou a sessão/login caiu antes de qualquer extração |
-| `2` | Erro de configuração: `.env` incompleto, `fabricantes.yaml` inválido, período malformado, `--fabricante` inexistente, ou seletor ainda por preencher |
+| `2` | Erro de configuração que impede a rodada: `.env` incompleto, `fabricantes.yaml` ilegível ou sem nenhum fabricante válido, período malformado, `--fabricante` inexistente, ou seletor ainda por preencher. Um fabricante isolado com cadastro inválido **não** cai aqui — ele fica de fora e a rodada segue |
 | `3` | Só com `--enviar`: os relatórios saíram, mas algum e-mail não foi entregue — o mesmo código do `src.disparo` |
 
 ### O arquivo formatado
@@ -467,7 +475,7 @@ entra na leva o que tem arquivo.
 
 1. **A confirmação.** Nada sai antes de você digitar `SIM`. `--sim` pula, para quando já
    conferiu no `--dry-run`.
-2. **`DESTINATARIO_TESTE` e `TELEFONE_TESTE`** no `.env`. Preenchidos, todo o canal vai para
+3. **`DESTINATARIO_TESTE` e `TELEFONE_TESTE`** no `.env`. Preenchidos, todo o canal vai para
    você e nenhuma indústria é tocada. São **independentes** — preencher só um deixa o outro
    canal enviando de verdade, e é por isso que o cabeçalho marca `TESTE` ou `REAL` linha a
    linha.
@@ -482,7 +490,7 @@ entra na leva o que tem arquivo.
    veria, sem que ninguém precise desligar a trava para isso — que seria a forma errada de
    resolver o mesmo problema. Com a trava ligada, o campo `copia` de cada laboratório é
    **suprimido** junto: ninguém de fora entra na mensagem por nenhuma via.
-3. **`envios.json`.** O que já foi entregue não é reenviado. O registro é gravado **a cada
+4. **`envios.json`.** O que já foi entregue não é reenviado. O registro é gravado **a cada
    mensagem**, não no fim: se o comando morrer na décima de vinte e quatro, as nove que saíram
    ficam registradas. `--refazer` ignora isso, de propósito.
 
@@ -701,8 +709,9 @@ EUROFARMA/EUROFARMA_RX, as duas Brace Pharma, ACHE/BIOSINTETICA.
 
 Quem não tiver contato **continua sendo extraído normalmente** — só não entra no envio, e
 aparece nominalmente no resumo. Telefone vai em formato internacional (`+5511999999999`) e
-e-mail precisa de `@`; os dois são conferidos no carregamento, com código 2 antes de qualquer
-conexão.
+e-mail precisa de `@`; os dois são conferidos no carregamento, antes de qualquer conexão.
+Um contato malformado tira **aquele** fabricante da rodada e avisa por e-mail — não derruba
+os outros.
 
 ### O texto das mensagens
 
@@ -783,19 +792,38 @@ carrega arquivo, então laboratórios com `whatsapp_anexo: true` são avisados n
 
 ## 6. Agendar no Windows
 
+> **A tarefa existe e está DESABILITADA.** Ela foi criada com o gatilho e o caminho
+> corretos, mas não dispara — a homologação ainda não terminou. Enquanto estiver assim, as
+> rodadas continuam sendo manuais. Para ligar, depois de validar tudo:
+>
+> ```powershell
+> schtasks /Change /TN "Mapa de Estoque - Geweb" /ENABLE
+> ```
+>
+> Para conferir o estado a qualquer momento:
+>
+> ```powershell
+> Get-ScheduledTask -TaskName "Mapa de Estoque - Geweb" | Select-Object TaskName, State
+> ```
+
 **Uma tarefa só, todo dia útil.** A agenda está dentro do script — ele decide o que gerar em
 cada dia, e num dia sem envio sai em 0,4 s sem nem abrir o navegador. Não crie uma tarefa
 por periodicidade.
 
+Se algum dia precisar recriá-la (o caminho tem espaços e acento — mantenha as aspas):
+
 ```powershell
-schtasks /Create /TN "Mapa de Estoque - Geweb" /SC WEEKLY /D MON,TUE,WED,THU,FRI /ST 07:00 /TR "C:\Users\pedro.veloso\Documents\script-test\executar.bat" /F
+$raiz = "C:\Users\pedro.veloso\Documents\Desenvolvimento - Interno\mapa-de-estoque"
+$acao = New-ScheduledTaskAction -Execute (Join-Path $raiz "executar.bat") -WorkingDirectory $raiz
+$gatilho = New-ScheduledTaskTrigger -Weekly -DaysOfWeek Monday,Tuesday,Wednesday,Thursday,Friday -At 7:00am
+$config = New-ScheduledTaskSettingsSet -StartWhenAvailable -DontStopIfGoingOnBatteries -AllowStartIfOnBatteries
+Register-ScheduledTask -TaskName "Mapa de Estoque - Geweb" -Action $acao -Trigger $gatilho -Settings $config -Force
+Disable-ScheduledTask -TaskName "Mapa de Estoque - Geweb"   # habilite só depois de homologar
 ```
 
-Ou pelo Agendador de Tarefas → Criar Tarefa Básica:
-
-- **Gatilho:** semanalmente, seg/ter/qua/qui/sex, 07:00
-- **Ação:** Iniciar um programa
-- **Programa/script:** `C:\Users\pedro.veloso\Documents\script-test\executar.bat`
+`-StartWhenAvailable` faz a tarefa rodar assim que a máquina voltar, se ela estava desligada
+às 07:00 — que é exatamente o que o mensal recuperável espera (veja *O mensal se recupera
+sozinho*).
 
 Não precisa preencher *"Iniciar em"*: o `.bat` faz `cd /d "%~dp0"` sozinho, justamente para
 não depender da pasta de trabalho da tarefa. O log fica em `logs\agendador.log`, com início,
@@ -808,8 +836,13 @@ para o que isso implica. Para voltar ao arranjo anterior (extrair agendado, envi
 tire o `--enviar` do [executar.bat](executar.bat); nada mais muda.
 
 O código de saída **3** no `agendador.log` é a assinatura de "os relatórios saíram, mas
-algum e-mail não foi entregue". Vale conferir esse log de vez em quando: no modo agendado
-ninguém vê a falha na hora.
+algum e-mail não foi entregue".
+
+**Você não precisa vigiar o log.** Quando a rodada não termina limpa, o script manda um
+e-mail para o endereço em `ALERTA_PARA` dizendo o que falhou, nomeando cada laboratório —
+relatório que não saiu, arquivo que ficou só no formato bruto, fabricante que ficou de fora
+por erro de cadastro e envio que não entregou. Rodada limpa **não** gera e-mail nenhum: um
+aviso diário de "tudo certo" só treina as pessoas a ignorar o alerta.
 
 O que sai em cada dia:
 
@@ -833,15 +866,21 @@ O que sai em cada dia:
 
 ## Ordem de validação recomendada
 
-1. `python -m src.geweb.session` → o navegador loga e para na home.
-2. Um fabricante, um mês → **abra o Excel e compare com o relatório gerado à mão**. Este é o
+1. `python -m pytest` → verde. Não abre navegador, roda em menos de um segundo, e o último
+   teste confere que o `fabricantes.yaml` de produção continua válido.
+2. `python -m src.geweb.session` → o navegador loga e para na home.
+3. Um fabricante, um mês → **abra o Excel e compare com o relatório gerado à mão**. Este é o
    teste que realmente importa. Confira também o cabeçalho da última coluna: precisa dizer
    `JULHO_2026`, e não o mês corrente.
-3. Rodada completa → um arquivo por fabricante e resumo no final.
-4. Coloque um `codigo` inválido num fabricante → os demais devem concluir normalmente e ele
+4. Rodada completa → um arquivo por fabricante e resumo no final.
+5. Coloque um `codigo` inválido num fabricante → os demais devem concluir normalmente e ele
    aparecer como falha no resumo.
-5. Repita com `--headless` → resultado idêntico. É comum quebrar aqui na primeira vez.
-6. Só então agende.
+6. Ponha um e-mail sem `@` no `contatos` de um fabricante → ele deve ficar **de fora** com
+   `CADASTRO IGNORADO` no log, os demais rodarem normalmente, e chegar um e-mail em
+   `ALERTA_PARA` nomeando quem ficou de fora. Desfaça a edição depois.
+7. Repita com `--headless` → resultado idêntico. É comum quebrar aqui na primeira vez.
+8. Só então **habilite** a tarefa agendada — ela já existe, criada desabilitada:
+   `schtasks /Change /TN "Mapa de Estoque - Geweb" /ENABLE`
 
 ---
 
@@ -883,6 +922,24 @@ rodadas seguintes; quando a sessão expirar, repita o comando.
 
 ---
 
+## Testes
+
+```powershell
+.venv\Scripts\pip install -r requirements-dev.txt
+.venv\Scripts\python -m pytest
+```
+
+Cobrem as três partes que decidem tudo e **não tocam rede nem navegador**: o calendário
+(`src/periodo.py` — 1º dia útil com feriado, virada de ano, as duas janelas semanais), a
+agenda (`src/agenda.py` — quem roda hoje e a recuperação do mensal atrasado) e a validação do
+cadastro (`src/config.py`). Rodam em menos de um segundo.
+
+Um dos testes carrega o **`fabricantes.yaml` de produção**: qualquer edição no cadastro real
+precisa continuar passando. Rode `pytest` depois de mexer no cadastro — é mais rápido e mais
+completo que o `--planejar`.
+
+---
+
 ## Estrutura
 
 | Arquivo | Papel |
@@ -903,3 +960,6 @@ rodadas seguintes; quando a sessão expirar, repita o comando.
 | [src/disparo/canais/](src/disparo/canais/) | Um módulo por meio de entrega — SMTP, API de WhatsApp e rascunho |
 | [src/disparo/limites.py](src/disparo/limites.py) | Cota horária, disjuntor e teto por rodada — as defesas contra descontrole |
 | [src/descobrir.py](src/descobrir.py) | Diagnóstico da tela e extração da lista de fornecedores — não faz parte da rodada |
+| [src/alerta.py](src/alerta.py) | Avisa por e-mail quando a rodada não termina limpa |
+| [src/log.py](src/log.py) | Configuração única do log, com rotação (1 MB × 5 gerações) |
+| [tests/](tests/) | Testes de `periodo`, `agenda`, validação do cadastro e alerta |

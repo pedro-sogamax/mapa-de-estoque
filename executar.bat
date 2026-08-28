@@ -11,9 +11,15 @@ REM Codigos de saida:
 REM   0  tudo certo          2  erro de configuracao
 REM   1  extracao falhou     3  extraiu, mas algum e-mail nao foi entregue
 REM
-REM Configuracao da tarefa agendada:
-REM   Programa/script : C:\Users\pedro.veloso\Documents\script-test\executar.bat
-REM   Iniciar em      : C:\Users\pedro.veloso\Documents\script-test
+REM Configuracao da tarefa agendada (o caminho tem espacos e acento — mantenha as aspas):
+REM   Programa/script : "C:\Users\pedro.veloso\Documents\Desenvolvimento - Interno\mapa-de-estoque\executar.bat"
+REM   Iniciar em      : "C:\Users\pedro.veloso\Documents\Desenvolvimento - Interno\mapa-de-estoque"
+REM
+REM Para conferir o que esta agendado de verdade:
+REM   schtasks /Query /TN "Mapa de Estoque - Geweb" /V /FO LIST
+REM
+REM A tarefa e criada DESABILITADA (veja o README). Habilite so depois de homologar:
+REM   schtasks /Change /TN "Mapa de Estoque - Geweb" /ENABLE
 
 setlocal
 cd /d "%~dp0"

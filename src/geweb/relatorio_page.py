@@ -74,9 +74,16 @@ def _capturar_download(
             decorrido += _INTERVALO_POLL_MS
 
         if not capturados:
+            # Tres causas diferentes chegam aqui e a mensagem precisa nomear as tres, porque
+            # a mais comum (fabricante sem movimento no periodo) NAO e um defeito e nao tem
+            # como ser distinguida enquanto MENSAGEM_SEM_DADOS estiver vazio em seletores.py.
             raise FalhaNaGeracao(
-                f"Nenhum download em {timeout_ms // 1000}s apos clicar em Gerar. "
-                "Aumente TIMEOUT_RELATORIO_MS no .env ou confira o seletor BOTAO_GERAR."
+                f"Nenhum download em {timeout_ms // 1000}s apos clicar em Gerar. Pode ser: "
+                "(1) o fabricante nao teve movimento no periodo e o Geweb nao gerou arquivo "
+                "— confira a tela e, se houver mensagem de 'nenhum registro', preencha "
+                "MENSAGEM_SEM_DADOS em src/geweb/seletores.py para o script reconhece-la; "
+                "(2) o relatorio demorou mais que o previsto — aumente TIMEOUT_RELATORIO_MS "
+                "no .env; (3) a tela do Geweb mudou — confira o seletor BOTAO_GERAR."
             )
         return capturados[0]
     finally:
