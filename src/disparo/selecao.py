@@ -29,8 +29,21 @@ def _numero(arquivo: Path) -> int:
     return int(prefixo) if prefixo.isdigit() else -1
 
 
+def _rotulo_do_arquivo(arquivo: Path) -> str | None:
+    """Rotulo do periodo lido do NOME do arquivo: 0112_MARJAN_2026-09-01_a_2026-09-13.xlsx.
+
+    A pasta nao diz mais o periodo — ela e o mes (MARJAN\\2026-09\\), onde convivem o mensal
+    e todos os acumulados daquele mes. O fabricante vem da pasta de cima, e nao de um split
+    no "_", porque o proprio nome pode ter "_" (EMS_RX).
+    """
+    prefixo, achou, rotulo = arquivo.stem.partition(f"_{arquivo.parent.parent.name}_")
+    if not achou or not prefixo.isdigit() or not rotulo:
+        return None
+    return rotulo
+
+
 def _periodo_por_extenso(rotulo: str) -> str:
-    """Rotulo de pasta -> texto para a mensagem: "2026-07" vira "julho/2026"."""
+    """Rotulo do periodo -> texto para a mensagem: "2026-07" vira "julho/2026"."""
     meses = (
         "janeiro", "fevereiro", "marco", "abril", "maio", "junho",
         "julho", "agosto", "setembro", "outubro", "novembro", "dezembro",
@@ -53,7 +66,9 @@ def da_ultima_rodada(cfg: Config) -> list[ItemDaRodada]:
 def do_periodo(cfg: Config, rotulo: str) -> list[ItemDaRodada]:
     """Varre o FORMATADO_DIR atras dos relatorios de um periodo."""
     melhor: dict[str, Path] = {}
-    for arquivo in cfg.formatado_dir.rglob(f"*/{rotulo}/*.xlsx"):
+    for arquivo in cfg.formatado_dir.glob("*/*/*.xlsx"):
+        if _rotulo_do_arquivo(arquivo) != rotulo:
+            continue
         fabricante = arquivo.parent.parent.name
         atual = melhor.get(fabricante)
         if atual is None or _numero(arquivo) > _numero(atual):
@@ -74,5 +89,5 @@ def do_periodo(cfg: Config, rotulo: str) -> list[ItemDaRodada]:
 
 def periodos_disponiveis(cfg: Config) -> list[str]:
     """Rotulos que existem no FORMATADO_DIR — para sugerir na mensagem de erro."""
-    rotulos = {p.parent.name for p in cfg.formatado_dir.rglob("*/*/*.xlsx")}
-    return sorted(rotulos, reverse=True)
+    rotulos = {_rotulo_do_arquivo(p) for p in cfg.formatado_dir.glob("*/*/*.xlsx")}
+    return sorted((r for r in rotulos if r), reverse=True)

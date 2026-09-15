@@ -66,6 +66,7 @@ class Resultado:
     motivo: str
     periodo: str
     rotulo: str = ""
+    # O .xls do Geweb. So continua em disco quando a formatacao falhou — veja _descartar_bruto.
     arquivo: Path | None = None
     formatado: Path | None = None
     erro: str | None = None
@@ -105,6 +106,33 @@ def _formatar(arquivo: Path, cfg: Config) -> tuple[Path | None, str | None]:
     return formatado, None
 
 
+def _descartar_bruto(arquivo: Path, raiz: Path) -> bool:
+    """Apaga o .xls do Geweb depois que o .xlsx formatado saiu. Devolve True se apagou.
+
+    So o formatado e guardado: e ele que vai para a industria. Quem chama so descarta com o
+    formatado ja salvo — sem ele, o bruto e o unico arquivo que resta para enviar.
+
+    As pastas de fabricante e periodo que ficarem vazias saem junto, subindo ate `raiz` (o
+    DOWNLOAD_DIR), que nunca e removida. Falhar aqui so deixa um arquivo a mais em disco.
+    """
+    try:
+        arquivo.unlink()
+    except OSError as erro:
+        log.warning("    Nao consegui apagar o arquivo bruto %s: %s", arquivo, erro)
+        return False
+
+    raiz = raiz.resolve()
+    pasta = arquivo.parent.resolve()
+    while pasta != raiz and raiz in pasta.parents:
+        try:
+            pasta.rmdir()  # so remove pasta vazia
+        except OSError:
+            break
+        pasta = pasta.parent
+    log.debug("    bruto descartado: %s", arquivo)
+    return True
+
+
 def _registrar_entrega(estado: EstadoDaAgenda | None, tarefa: Tarefa) -> None:
     """Marca o mensal como entregue. Rodadas manuais (--mes) nao mexem na agenda."""
     if estado is not None and tarefa.motivo == "mensal":
@@ -120,7 +148,8 @@ def extrair_todos(
     nada, e a rodada do dia seguinte tenta esse fabricante de novo.
     """
     resultados: list[Resultado] = []
-    sequencia = Sequencia(cfg.sequencia_path, cfg.download_dir)
+    # As duas arvores: com o bruto descartado, a numeracao ja usada so aparece no formatado.
+    sequencia = Sequencia(cfg.sequencia_path, cfg.download_dir, cfg.formatado_dir)
 
     with sessao_geweb(cfg) as page:
         tela = RelatorioComprasVendas(page, cfg)
@@ -133,7 +162,7 @@ def extrair_todos(
             destino = (
                 cfg.download_dir
                 / pasta
-                / periodo.rotulo
+                / periodo.pasta_do_mes
                 / f"{numero:04d}_{pasta}_{periodo.rotulo}.xlsx"
             )
             try:
@@ -143,13 +172,17 @@ def extrair_todos(
                 # conversao nao pode fazer o script reextrair o mesmo mes amanha.
                 _registrar_entrega(estado, tarefa)
                 formatado, aviso = _formatar(arquivo, cfg)
+                if formatado is not None and _descartar_bruto(arquivo, cfg.download_dir):
+                    bruto = None
+                else:
+                    bruto = arquivo
                 resultados.append(
                     Resultado(
                         fabricante.nome,
                         tarefa.motivo,
                         str(periodo),
                         rotulo=periodo.rotulo,
-                        arquivo=arquivo,
+                        arquivo=bruto,
                         formatado=formatado,
                         aviso=aviso,
                     )
@@ -202,7 +235,7 @@ def _registrar_rodada(cfg: Config, resultados: list[Resultado]) -> list[ItemDaRo
             formatado=r.formatado,
         )
         for r in resultados
-        if r.ok and r.arquivo is not None
+        if r.ok and (r.formatado or r.arquivo)
     ]
     try:
         gravar_rodada(cfg.rodada_path, itens)

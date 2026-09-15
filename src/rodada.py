@@ -12,9 +12,12 @@ O formato (ultima-rodada.json, na raiz) e legivel de proposito, para conferir nu
       "itens": [
         {"fabricante": "MARJAN", "motivo": "semanal/segunda",
          "periodo": "01/08/2026 a 16/08/2026", "rotulo": "2026-08-01_a_2026-08-16",
-         "arquivo": "...\0056_MARJAN_....xls", "formatado": "...\0056_MARJAN_....xlsx"}
+         "arquivo": null, "formatado": "...\0056_MARJAN_....xlsx"}
       ]
     }
+
+`arquivo` e o .xls bruto do Geweb, que so e guardado quando a formatacao falha — no caso
+normal ele e descartado e fica `null`. Todo item tem ao menos um dos dois.
 """
 
 from __future__ import annotations
@@ -37,13 +40,17 @@ class ItemDaRodada:
     motivo: str
     periodo: str
     rotulo: str
-    arquivo: Path
+    arquivo: Path | None
     formatado: Path | None = None
+
+    def __post_init__(self) -> None:
+        if self.arquivo is None and self.formatado is None:
+            raise ValueError(f"{self.fabricante}: item da rodada sem arquivo nenhum")
 
     @property
     def anexo(self) -> Path:
         """O que vai anexado: o .xlsx formatado; o bruto so se a formatacao tiver falhado."""
-        return self.formatado or self.arquivo
+        return self.formatado or self.arquivo  # __post_init__ garante que um dos dois existe
 
 
 def gravar(caminho: Path, itens: list[ItemDaRodada]) -> None:
@@ -60,7 +67,7 @@ def gravar(caminho: Path, itens: list[ItemDaRodada]) -> None:
                 "motivo": item.motivo,
                 "periodo": item.periodo,
                 "rotulo": item.rotulo,
-                "arquivo": str(item.arquivo),
+                "arquivo": str(item.arquivo) if item.arquivo else None,
                 "formatado": str(item.formatado) if item.formatado else None,
             }
             for item in itens
@@ -92,9 +99,11 @@ def ler(caminho: Path) -> list[ItemDaRodada]:
             motivo=str(item.get("motivo", "")),
             periodo=str(item.get("periodo", "")),
             rotulo=str(item.get("rotulo", "")),
-            arquivo=Path(item["arquivo"]),
+            arquivo=Path(item["arquivo"]) if item.get("arquivo") else None,
             formatado=Path(item["formatado"]) if item.get("formatado") else None,
         )
         for item in itens
-        if isinstance(item, dict) and item.get("fabricante") and item.get("arquivo")
+        if isinstance(item, dict)
+        and item.get("fabricante")
+        and (item.get("arquivo") or item.get("formatado"))
     ]

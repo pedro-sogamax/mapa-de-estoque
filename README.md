@@ -33,7 +33,7 @@ São vinte e oito chaves, lidas por [src/config.py](src/config.py):
 | `GEWEB_URL` | **sim** | — | URL da tela de **login** (não a do menu) |
 | `GEWEB_USUARIO` | **sim** | — | Usuário do Geweb — de preferência um dedicado à automação |
 | `GEWEB_SENHA` | **sim** | — | Senha correspondente |
-| `DOWNLOAD_DIR` | não | `downloads` | Onde os relatórios brutos do Geweb são gravados (veja *Saída*) |
+| `DOWNLOAD_DIR` | não | `downloads` | Passagem do arquivo bruto do Geweb — só fica guardado se a formatação falhar (veja *Saída*) |
 | `FORMATADO_DIR` | não | `formatado` | Onde vai o `.xlsx` já formatado, pronto para enviar |
 | `HEADLESS` | não | `false` | `true` roda sem abrir janela |
 | `TIMEOUT_MS` | não | `30000` | Timeout das ações de tela |
@@ -314,14 +314,17 @@ com código 2. `--inicio` e `--fim` andam sempre juntos.
 
 ### Saída
 
-Cada relatório sai em **duas versões**, em duas árvores iguais:
+O Geweb entrega o relatório em `downloads\`, ele é formatado em `formatado\` e **só o
+formatado fica**:
 
 ```
-downloads\EUROFARMA_RX\2026-07\0001_EUROFARMA_RX_2026-07.xls    <- como o Geweb entregou
-formatado\EUROFARMA_RX\2026-07\0001_EUROFARMA_RX_2026-07.xlsx   <- pronto para enviar
+downloads\EUROFARMA_RX\2026-07\0001_EUROFARMA_RX_2026-07.xls    <- como o Geweb entregou (apagado)
+formatado\EUROFARMA_RX\2026-07\0001_EUROFARMA_RX_2026-07.xlsx   <- pronto para enviar (guardado)
 ```
 
-O bruto nunca é apagado: se um dia a formatação sair errada, o arquivo original continua lá.
+O bruto é apagado assim que o `.xlsx` é gravado, junto com as pastas de fabricante e período
+que ficarem vazias. A exceção é a **formatação que falha**: aí o bruto fica em `downloads\`,
+porque é o único arquivo que resta para enviar (veja *O arquivo formatado*).
 
 Fica **dentro do projeto**, não na pasta Downloads do Windows. Os destinos são o
 `DOWNLOAD_DIR` e o `FORMATADO_DIR` do `.env`:
@@ -333,9 +336,9 @@ Fica **dentro do projeto**, não na pasta Downloads do Windows. Os destinos são
 | `\\servidor\publico\mapas` | direto na pasta de rede |
 | `C:\Users\<voce>\OneDrive\Mapas` | dentro do OneDrive, sincronizando sozinho |
 
-`FORMATADO_DIR` segue exatamente as mesmas regras. As duas pastas são independentes — dá para
-deixar o bruto local e mandar só o formatado para a pasta de rede ou para o OneDrive, que é o
-arranjo mais útil quando outra pessoa vai pegar o arquivo para enviar.
+`FORMATADO_DIR` segue exatamente as mesmas regras. As duas pastas são independentes — como o
+bruto quase nunca fica, o `DOWNLOAD_DIR` pode ser local e só o `FORMATADO_DIR` apontar para a
+pasta de rede ou para o OneDrive.
 
 > ⚠️ **Pasta de rede:** use o caminho UNC completo (`\\servidor\pasta`), **nunca a letra
 > mapeada** (`Z:\pasta`). Unidades mapeadas só existem dentro da sessão interativa do
@@ -343,8 +346,19 @@ arranjo mais útil quando outra pessoa vai pegar o arquivo para enviar.
 > existe e a extração falha ao salvar. Confirme também que o usuário da tarefa agendada tem
 > permissão de escrita no compartilhamento.
 
-O período vira o nome da pasta: mês cheio → `2026-07`; intervalo livre →
-`2026-07-27_a_2026-07-31`. Assim uma extração semanal nunca sobrescreve a mensal.
+A pasta é o **mês dos dados**, e dentro dela ficam o mensal e todos os acumulados daquele mês,
+quantas vezes tenham sido tirados. O período exato fica no nome do arquivo:
+
+```
+formatado\MARJAN\2026-08\0078_MARJAN_2026-08-01_a_2026-08-24.xlsx   <- acumulado
+formatado\MARJAN\2026-08\0087_MARJAN_2026-08-01_a_2026-08-30.xlsx   <- acumulado
+formatado\MARJAN\2026-08\0105_MARJAN_2026-08.xlsx                   <- mensal de agosto
+formatado\MARJAN\2026-09\0112_MARJAN_2026-09-01_a_2026-09-13.xlsx
+```
+
+O mensal de agosto, gerado em setembro, fica em `2026-08`. Um intervalo que atravessa a virada
+do mês fica no mês em que começa. O número sequencial garante que nenhum arquivo sobrescreve
+outro, e o `--periodo` do disparo lê o período pelo nome do arquivo, não pela pasta.
 
 **Numeração sequencial** — cada arquivo recebe um número único e crescente, para nenhum
 relatório sair com o mesmo nome de outro. O contador fica em `sequencia.json`, na raiz, e:
@@ -352,8 +366,8 @@ relatório sair com o mesmo nome de outro. O contador fica em `sequencia.json`, 
 - **sobrevive entre execuções** — reextrair o mesmo fabricante e período gera um arquivo
   novo (`0001_...` e `0003_...` convivem), preservando o histórico;
 - **não abre buracos** — se um fabricante falhar, o número reservado volta para a fila;
-- **se recompõe sozinho** — apagado o `sequencia.json`, ele varre `downloads\` e retoma do
-  maior número existente, para nunca reaproveitar um número já usado.
+- **se recompõe sozinho** — apagado o `sequencia.json`, ele varre `downloads\` e `formatado\`
+  e retoma do maior número existente, para nunca reaproveitar um número já usado.
 
 Log: `logs\execucao.log` — acumula todas as rodadas, sem rotação.
 
@@ -392,9 +406,9 @@ Conteúdo não muda: são as mesmas 11 colunas, na mesma ordem, com os mesmos va
 mandou. O formatador só converte e formata.
 
 **Se a conversão falhar** (o Geweb devolveu uma página de erro, ou mudou o relatório), a rodada
-**não** é interrompida e o código de saída continua `0`: o `.xls` bruto já está salvo e é
-exatamente o arquivo que o comprador enviava antes. O resumo avisa quais precisam ser
-formatados à mão:
+**não** é interrompida e o código de saída continua `0`: o `.xls` bruto **não é apagado** —
+fica em `downloads\` e é exatamente o arquivo que o comprador enviava antes. O resumo avisa
+quais precisam ser formatados à mão:
 
 ```
 ok    EUROFARMA_RX               mensal           2026-07
@@ -402,7 +416,7 @@ ok    EUROFARMA_RX               mensal           2026-07
 1 relatorio(s) sairam so no formato bruto do Geweb — formate a mao antes de enviar.
 ```
 
-Para conferir a conversão de um arquivo já baixado, sem abrir o Geweb:
+Para conferir a conversão de um bruto que ficou guardado, sem abrir o Geweb:
 
 ```powershell
 .venv\Scripts\python -m src.formatador `

@@ -176,7 +176,8 @@ pedem o arquivo dentro do corpo, outras têm portal próprio.
 
 ## 4. Regras de disparo
 
-**Gatilho.** Só dispara para `Resultado` com `arquivo` preenchido. Laboratório que falhou na
+**Gatilho.** Só dispara para `Resultado` com `formatado` ou `arquivo` preenchido — o bruto é
+descartado quando o formatado sai, então no caso normal só o `formatado` existe. Laboratório que falhou na
 extração não gera mensagem nenhuma — o erro aparece no resumo e a rodada do dia seguinte
 tenta de novo, como já acontece hoje. O anexo é o `formatado`, caindo para o `arquivo` bruto
 quando a formatação falhou (§5).
@@ -284,9 +285,10 @@ Isso já não vale. [src/formatador.py](../src/formatador.py) converte cada rela
 
 Dois detalhes para o adaptador de envio:
 
-- `formatado` pode vir `None` se a conversão falhar (o campo `aviso` diz por quê). Nesse caso
-  o `.xls` bruto continua em `arquivo` e serve de reserva — é exatamente o que a indústria
-  recebe hoje e aceita.
+- `formatado` pode vir `None` se a conversão falhar (o campo `aviso` diz por quê). Só nesse
+  caso o `.xls` bruto é guardado, em `arquivo`, e serve de reserva — é exatamente o que a
+  indústria recebe hoje e aceita. Com a conversão bem-sucedida o bruto é apagado e `arquivo`
+  vem `None`.
 - PDF continua fora de cogitação: a indústria manipula os números do mapa.
 
 ---

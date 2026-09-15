@@ -4,8 +4,9 @@ Cada arquivo baixado recebe um numero unico e crescente, que nunca se repete —
 fabricantes, nem entre periodos, nem quando o mesmo relatorio e extraido de novo.
 
 O contador vive em sequencia.json, na raiz do projeto. Se o arquivo sumir, ele se recompoe
-a partir do maior numero encontrado na pasta de downloads, para nunca reaproveitar um
-numero ja usado.
+a partir do maior numero encontrado nas pastas de relatorios, para nunca reaproveitar um
+numero ja usado. Sao as DUAS pastas (bruto e formatado): o bruto e descartado depois de
+formatado, entao a maior parte da numeracao so existe na arvore do formatado.
 """
 
 from __future__ import annotations
@@ -23,9 +24,9 @@ _PADRAO_NUMERO = re.compile(r"^(\d+)_")
 class Sequencia:
     """Contador persistente. Grava a cada retirada, para uma queda no meio nao repetir numero."""
 
-    def __init__(self, arquivo: Path, pasta_downloads: Path) -> None:
+    def __init__(self, arquivo: Path, *pastas: Path) -> None:
         self.arquivo = arquivo
-        self.pasta_downloads = pasta_downloads
+        self.pastas = pastas
         self._ultimo = self._carregar()
 
     def _carregar(self) -> int:
@@ -34,7 +35,7 @@ class Sequencia:
             try:
                 gravado = int(json.loads(self.arquivo.read_text(encoding="utf-8"))["ultimo"])
             except (ValueError, KeyError, TypeError, json.JSONDecodeError):
-                log.warning("%s ilegivel; recompondo pelo conteudo de downloads.", self.arquivo.name)
+                log.warning("%s ilegivel; recompondo pelos relatorios ja gerados.", self.arquivo.name)
 
         # Rede de seguranca: mesmo com o contador perdido, nunca repetir um numero existente.
         nos_arquivos = self._maior_numero_ja_usado()
@@ -48,11 +49,11 @@ class Sequencia:
         return max(gravado, nos_arquivos)
 
     def _maior_numero_ja_usado(self) -> int:
-        if not self.pasta_downloads.exists():
-            return 0
         numeros = [
             int(casamento.group(1))
-            for caminho in self.pasta_downloads.rglob("*")
+            for pasta in self.pastas
+            if pasta.exists()
+            for caminho in pasta.rglob("*")
             if caminho.is_file() and (casamento := _PADRAO_NUMERO.match(caminho.name))
         ]
         return max(numeros, default=0)

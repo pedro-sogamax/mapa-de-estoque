@@ -49,6 +49,17 @@ class Periodo:
         return f"{self.inicio:%Y-%m-%d}_a_{self.fim:%Y-%m-%d}"
 
     @property
+    def pasta_do_mes(self) -> str:
+        """Pasta onde o relatorio e guardado: o MES DOS DADOS, "2026-08".
+
+        Dentro dela convivem o mensal e todos os acumulados daquele mes, quantas vezes tenham
+        sido tirados — o periodo exato fica no nome do arquivo (veja `rotulo`). O mensal de
+        agosto, gerado em setembro, vai para 2026-08. Um intervalo que atravessa a virada do
+        mes (semana_fechada de 28/09 a 02/10) fica no mes em que comeca.
+        """
+        return self.inicio.strftime("%Y-%m")
+
+    @property
     def inicio_br(self) -> str:
         return self.inicio.strftime("%d/%m/%Y")
 
