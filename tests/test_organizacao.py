@@ -11,7 +11,9 @@ from datetime import date
 from pathlib import Path
 from types import SimpleNamespace
 
+from src.config import Comprador, Fabricante
 from src.disparo.selecao import _rotulo_do_arquivo, do_periodo, periodos_disponiveis
+from src.main import _pasta_do_comprador
 from src.periodo import acumulado_do_mes, intervalo, mes_cheio
 
 
@@ -76,3 +78,58 @@ class TestDoPeriodo:
         cfg = SimpleNamespace(formatado_dir=tmp_path)
 
         assert periodos_disponiveis(cfg) == ["2026-08-01_a_2026-08-24", "2026-08"]
+
+
+class TestPastaDoComprador:
+    """A arvore ganhou um nivel: COMPRADOR/FABRICANTE/2026-09/arquivo.xlsx.
+
+    O que a industria recebe nao muda — muda so onde o arquivo fica, para cada comprador
+    achar a propria carteira na pasta do ownCloud sem filtrar 46 laboratorios.
+    """
+
+    def _fabricante(self, nome, comprador=None):
+        return Fabricante(
+            nome=nome,
+            codigos=("123",),
+            comprador=Comprador(nome=comprador) if comprador else None,
+        )
+
+    def test_usa_o_comprador_do_laboratorio(self):
+        cfg = SimpleNamespace(comprador="Yuri Toso")
+        fabricante = self._fabricante("BLAU", comprador="Geliana Ferreira")
+
+        assert _pasta_do_comprador(fabricante, cfg) == "Geliana Ferreira"
+
+    def test_sem_bloco_cai_no_comprador_do_env(self):
+        """E o que mantem a arvore certa enquanto o cadastro nao tem os blocos."""
+        cfg = SimpleNamespace(comprador="Yuri Toso")
+
+        assert _pasta_do_comprador(self._fabricante("MARJAN"), cfg) == "Yuri Toso"
+
+    def test_sem_comprador_nenhum_a_pasta_denuncia(self):
+        cfg = SimpleNamespace(comprador="")
+
+        assert _pasta_do_comprador(self._fabricante("MARJAN"), cfg) == "SEM_COMPRADOR"
+
+    def test_disparo_acha_o_relatorio_na_arvore_com_comprador(self, tmp_path):
+        arquivo = _criar(
+            tmp_path / "Geliana Ferreira" / "BLAU" / "2026-08" / "0120_BLAU_2026-08.xlsx"
+        )
+        cfg = SimpleNamespace(formatado_dir=tmp_path)
+
+        itens = do_periodo(cfg, "2026-08")
+
+        assert [i.formatado for i in itens] == [arquivo]
+        assert itens[0].fabricante == "BLAU"
+
+    def test_as_duas_arvores_convivem(self, tmp_path):
+        """O historico gravado antes da mudanca continua sendo encontrado, sem migracao."""
+        antigo = _criar(tmp_path / "MARJAN" / "2026-08" / "0105_MARJAN_2026-08.xlsx")
+        novo = _criar(
+            tmp_path / "Geliana Ferreira" / "BLAU" / "2026-08" / "0120_BLAU_2026-08.xlsx"
+        )
+        cfg = SimpleNamespace(formatado_dir=tmp_path)
+
+        achados = {i.fabricante: i.formatado for i in do_periodo(cfg, "2026-08")}
+
+        assert achados == {"MARJAN": antigo, "BLAU": novo}

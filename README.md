@@ -52,7 +52,7 @@ São vinte e oito chaves, lidas por [src/config.py](src/config.py):
 | `WHATSAPP_PROVEDOR` | não | `zapi` | Perfil de API a usar |
 | `ZAPI_URL_BASE` / `ZAPI_INSTANCIA` / `ZAPI_TOKEN` / `ZAPI_CLIENT_TOKEN` | para enviar | — | Credenciais. Sem elas o canal de WhatsApp é pulado |
 | `INTERVALO_ENVIO_S` | não | `5` | Segundos entre laboratórios, para não parecer disparo em massa |
-| `MAX_ENVIOS_POR_RODADA` | não | `30` | Recusa a leva acima disso — pega cadastro duplicado |
+| `MAX_ENVIOS_POR_RODADA` | não | `95` | Recusa a leva acima disso — pega cadastro duplicado |
 | `MAX_ENVIOS_POR_HORA` | não | `90` | Cota por canal, abaixo do limite do provedor |
 | `MAX_FALHAS_SEGUIDAS` | não | `3` | Falhas que desligam um canal |
 | `MAX_TENTATIVAS` | não | `3` | Tentativas por mensagem, só para erro temporário |
@@ -318,9 +318,14 @@ O Geweb entrega o relatório em `downloads\`, ele é formatado em `formatado\` e
 formatado fica**:
 
 ```
-downloads\EUROFARMA_RX\2026-07\0001_EUROFARMA_RX_2026-07.xls    <- como o Geweb entregou (apagado)
-formatado\EUROFARMA_RX\2026-07\0001_EUROFARMA_RX_2026-07.xlsx   <- pronto para enviar (guardado)
+downloads\Yuri Toso\EUROFARMA_RX\2026-07\0001_EUROFARMA_RX_2026-07.xls    <- como o Geweb entregou (apagado)
+formatado\Yuri Toso\EUROFARMA_RX\2026-07\0001_EUROFARMA_RX_2026-07.xlsx   <- pronto para enviar (guardado)
 ```
+
+**A primeira pasta é o comprador**, para cada um achar a própria carteira sem filtrar 46
+laboratórios. O nome sai do bloco `comprador` do laboratório; sem ele, do `COMPRADOR` do
+`.env` — e sem nenhum dos dois, de uma pasta `SEM_COMPRADOR`, que deixa a falta visível em
+vez de espalhar relatório solto. O que a indústria recebe não muda: só onde o arquivo fica.
 
 O bruto é apagado assim que o `.xlsx` é gravado, junto com as pastas de fabricante e período
 que ficarem vazias. A exceção é a **formatação que falha**: aí o bruto fica em `downloads\`,
@@ -350,10 +355,10 @@ A pasta é o **mês dos dados**, e dentro dela ficam o mensal e todos os acumula
 quantas vezes tenham sido tirados. O período exato fica no nome do arquivo:
 
 ```
-formatado\MARJAN\2026-08\0078_MARJAN_2026-08-01_a_2026-08-24.xlsx   <- acumulado
-formatado\MARJAN\2026-08\0087_MARJAN_2026-08-01_a_2026-08-30.xlsx   <- acumulado
-formatado\MARJAN\2026-08\0105_MARJAN_2026-08.xlsx                   <- mensal de agosto
-formatado\MARJAN\2026-09\0112_MARJAN_2026-09-01_a_2026-09-13.xlsx
+formatado\Yuri Toso\MARJAN\2026-08\0078_MARJAN_2026-08-01_a_2026-08-24.xlsx   <- acumulado
+formatado\Yuri Toso\MARJAN\2026-08\0087_MARJAN_2026-08-01_a_2026-08-30.xlsx   <- acumulado
+formatado\Yuri Toso\MARJAN\2026-08\0105_MARJAN_2026-08.xlsx                   <- mensal de agosto
+formatado\Yuri Toso\MARJAN\2026-09\0112_MARJAN_2026-09-01_a_2026-09-13.xlsx
 ```
 
 O mensal de agosto, gerado em setembro, fica em `2026-08`. Um intervalo que atravessa a virada
@@ -516,7 +521,7 @@ suspender a conta de e-mail da empresa.
 
 | Proteção | Padrão | O que ela impede |
 |---|---|---|
-| **Teto por rodada** | 30 | Um `fabricantes.yaml` duplicado ou um manifesto errado virar centenas de mensagens. Recusa **antes de conectar**, com código 2 |
+| **Teto por rodada** | 95 | Um `fabricantes.yaml` duplicado ou um manifesto errado virar centenas de mensagens. Recusa **antes de conectar**, com código 2 |
 | **Cota por hora** | 90/canal | Estourar o limite da Locaweb (100/h por caixa). Ao atingir, para e diz a partir de que hora continuar |
 | **Disjuntor** | 3 falhas | Insistir com um servidor que já está recusando tudo. Desliga aquele canal; os outros seguem |
 | **Retentativa** | 3 tentativas | Perder um envio por soluço passageiro — mas **só** repete erro temporário |
@@ -550,8 +555,8 @@ leva cabe, e quais endereços recebem mais de uma mensagem.
 ```
   ATENCAO: mapa@eurofarma.com.br recebe 2 e-mails nesta leva (EUROFARMA, EUROFARMA_RX)
 
-  cota email     0 de 90 usados na ultima hora; cabem mais 90, a leva pede 24
-  teto por rodada: 30 mensagens
+  cota email     0 de 90 usados na ultima hora; cabem mais 90, a leva pede 46
+  teto por rodada: 95 mensagens
 ```
 
 O aviso de endereço repetido não bloqueia: EUROFARMA e EUROFARMA_RX são relatórios diferentes,

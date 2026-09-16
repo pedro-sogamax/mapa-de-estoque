@@ -64,9 +64,14 @@ def da_ultima_rodada(cfg: Config) -> list[ItemDaRodada]:
 
 
 def do_periodo(cfg: Config, rotulo: str) -> list[ItemDaRodada]:
-    """Varre o FORMATADO_DIR atras dos relatorios de um periodo."""
+    """Varre o FORMATADO_DIR atras dos relatorios de um periodo.
+
+    A varredura e recursiva de proposito: a arvore ganhou o nivel do comprador
+    (COMPRADOR/FABRICANTE/2026-09), e os relatorios gravados antes disso continuam um
+    nivel acima. Os dois convivem — o fabricante e sempre a pasta avo do arquivo.
+    """
     melhor: dict[str, Path] = {}
-    for arquivo in cfg.formatado_dir.glob("*/*/*.xlsx"):
+    for arquivo in cfg.formatado_dir.rglob("*.xlsx"):
         if _rotulo_do_arquivo(arquivo) != rotulo:
             continue
         fabricante = arquivo.parent.parent.name
@@ -89,5 +94,5 @@ def do_periodo(cfg: Config, rotulo: str) -> list[ItemDaRodada]:
 
 def periodos_disponiveis(cfg: Config) -> list[str]:
     """Rotulos que existem no FORMATADO_DIR — para sugerir na mensagem de erro."""
-    rotulos = {_rotulo_do_arquivo(p) for p in cfg.formatado_dir.glob("*/*/*.xlsx")}
+    rotulos = {_rotulo_do_arquivo(p) for p in cfg.formatado_dir.rglob("*.xlsx")}
     return sorted((r for r in rotulos if r), reverse=True)

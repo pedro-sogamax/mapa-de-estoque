@@ -36,6 +36,7 @@ from src.config import (
     RAIZ_PROJETO,
     Config,
     ConfiguracaoInvalida,
+    Fabricante,
     carregar_config,
     carregar_fabricantes_com_problemas,
 )
@@ -82,6 +83,23 @@ class Resultado:
 def _nome_de_pasta(nome: str) -> str:
     """Remove caracteres que o Windows nao aceita em nome de pasta."""
     return _CARACTERES_INVALIDOS.sub("-", nome).strip() or "sem-nome"
+
+
+def _nome_do_comprador(fabricante: Fabricante, cfg: Config) -> str:
+    """De quem e este laboratorio: o bloco `comprador` dele, ou o COMPRADOR do .env."""
+    return (fabricante.comprador.nome if fabricante.comprador else "") or cfg.comprador
+
+
+def _pasta_do_comprador(fabricante: Fabricante, cfg: Config) -> str:
+    """Nome da pasta que agrupa os laboratorios de um comprador.
+
+    Vale o bloco `comprador` do laboratorio; sem ele, o COMPRADOR do .env — o padrao de
+    quem so tem um comprador, e o que mantem a arvore certa antes de o cadastro ganhar os
+    blocos. Sem nenhum dos dois o relatorio ainda sai, numa pasta que denuncia a falta em
+    vez de espalhar arquivo solto.
+    """
+    nome = _nome_do_comprador(fabricante, cfg)
+    return _nome_de_pasta(nome) if nome.strip() else "SEM_COMPRADOR"
 
 
 def _configurar_log(nivel: int = logging.INFO) -> None:
@@ -161,6 +179,7 @@ def extrair_todos(
             numero = sequencia.proximo()
             destino = (
                 cfg.download_dir
+                / _pasta_do_comprador(fabricante, cfg)
                 / pasta
                 / periodo.pasta_do_mes
                 / f"{numero:04d}_{pasta}_{periodo.rotulo}.xlsx"
@@ -331,6 +350,13 @@ def _parsear_argumentos(argv: list[str] | None = None) -> argparse.Namespace:
         help="Processa apenas este fabricante (campo 'nome' do fabricantes.yaml).",
     )
     parser.add_argument(
+        "--comprador",
+        help=(
+            "Processa apenas os laboratorios destes compradores (bloco 'comprador' do "
+            "fabricantes.yaml). Aceita varios, separados por virgula."
+        ),
+    )
+    parser.add_argument(
         "--planejar",
         action="store_true",
         help="Mostra o que a rodada geraria e sai, sem abrir o navegador.",
@@ -428,6 +454,18 @@ def main(argv: list[str] | None = None) -> int:
             f" — {quantas} pendencia(s), codigo {codigo}"
         )
         alerta.enviar(cfg, assunto, linhas)
+
+    if args.comprador:
+        alvos = {p.strip().casefold() for p in args.comprador.split(",") if p.strip()}
+        conhecidos = sorted({_nome_do_comprador(f, cfg) for f in fabricantes})
+        fabricantes = [f for f in fabricantes if _nome_do_comprador(f, cfg).casefold() in alvos]
+        if not fabricantes:
+            log.error(
+                "Nenhum fabricante ativo para %r. Compradores no cadastro: %s",
+                args.comprador,
+                ", ".join(conhecidos) or "(nenhum)",
+            )
+            return 2
 
     if args.fabricante:
         alvo = args.fabricante.strip().casefold()
