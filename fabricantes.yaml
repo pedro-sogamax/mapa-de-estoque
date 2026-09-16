@@ -1,7 +1,7 @@
 # Fabricantes / laboratorios processados em cada rodada.
-# Gerado a partir de docs/Fabricantes atualizado.xlsx (comprador: YURI TOSO), que traz
-# tambem a coluna E-MAIL. A planilha anterior (FABRICANTES ENVIO MAPA.xlsx) nao tinha
-# contato nenhum e ficou obsoleta.
+# Gerado a partir de docs/ENVIO MAPA.xlsx (comprador: YURI TOSO, atualizada em 15/09/2026),
+# que traz na mesma tabela os dias de envio e a coluna E-MAIL. As planilhas anteriores
+# (FABRICANTES ENVIO MAPA.xlsx e Fabricantes atualizado.xlsx) ficaram obsoletas.
 #
 # nome          : identificador usado no nome da pasta de saida e nos logs.
 # codigos       : codigos do Geweb. Varios codigos = UM relatorio so, com todos somados
@@ -76,31 +76,55 @@ fabricantes:
   # Esvazia-la e a acao que libera o envio real. Antes disso, confira a leva com
   # `python -m src.disparo --dry-run`, que mostra o destino de cada mensagem.
   # =====================================================================================
+  # AGENDA DE 15/09/2026 — de docs/ENVIO MAPA.xlsx: TODOS com mensal e semanal de segunda;
+  # EUROFARMA_RX e MARJAN tambem na quarta. Entrou a CELLERA (dois codigos), saiu a ASPEN.
+  # =====================================================================================
   # --- ATENCAO: na planilha os codigos das linhas 2 e 3 estao trocados entre si. -------
   # 106975/106976 sao ACHE no Geweb e 9030/42818 sao BIOSINTETICA. Alinhei cada nome aos
   # codigos que ele realmente e, para a pasta nao mentir sobre o conteudo. Confirme.
+  # (Na ENVIO MAPA.xlsx de 15/09 os codigos ja vem nas linhas certas.)
   - nome: ACHE
     codigos:
       - 106975              # ACHE RX - ( PORTO DA IGREJA )
       - 106976              # ACHE RX - (CD ÁGUA CHATA )
+    dias_semana: [segunda]
     contatos: {emails: [neymar.silva@ache.com.br], copia: [pedro@sogamax.com.br, yuritoso@sogamax.com.br], canais: [email]}
 
   - nome: BIOSINTETICA_RX
     codigos:
       - 9030                # BIOSINTÉTICA RX - ( CD PORTO DA IGREJA)
       - 42818               # BIOSINTÉTICA RX - ( CD AGUA CHATA)
+    dias_semana: [segunda]
     contatos: {emails: [lindomar.amaral@biosintetica.com.br], copia: [pedro@sogamax.com.br, yuritoso@sogamax.com.br], canais: [email]}
   # ------------------------------------------------------------------------------------
 
+  # DESATIVADO em 15/09/2026: fora da docs/ENVIO MAPA.xlsx. Mantido no arquivo, como a
+  # SANOFI_MEDLEY — reativar e trocar por `true`. O registro em estado.json nao foi mexido.
   - nome: ASPEN
     codigos:
       - 7183                # ASPEN PHARMA DISTRIBUIDORA - (SERRA - ES)
       - 10972               # A.PHARMA DISTRIBUIDORA LTDA- (SERRA - ES)
+    ativo: false
     contatos: {emails: [fjunior4@br.aspenpharma.com], copia: [pedro@sogamax.com.br, yuritoso@sogamax.com.br], canais: [email]}
 
   - nome: BIOPAS
     codigo: 106499          # BIOPAS BRASIL PRODUTOS FARMACEUTICOS
+    dias_semana: [segunda]
     contatos: {emails: [Gustavo.Barbosa@swixxbiopharma.com], copia: [pedro@sogamax.com.br, yuritoso@sogamax.com.br], canais: [email]}
+
+  # Linhas 6 e 7 da ENVIO MAPA.xlsx: mesmo nome, codigos diferentes, sem " - " unindo.
+  # Sao dois relatorios separados, para o mesmo contato. Os dois codigos foram conferidos
+  # no Geweb em 15/09/2026 — o 123174 nao existia na lista de 03/08.
+
+  - nome: CELLERA_CONSUMO
+    codigo: 122992          # CELLERA - CONSUMO - ( SERRA - ES)
+    dias_semana: [segunda]
+    contatos: {emails: [leonardo.souza@cellerafarma.com.br], copia: [pedro@sogamax.com.br, yuritoso@sogamax.com.br], canais: [email]}
+
+  - nome: CELLERA_FARMACEUTICA
+    codigo: 123174          # CELLERA FARMACEUTICA ( SERRA - ES)
+    dias_semana: [segunda]
+    contatos: {emails: [leonardo.souza@cellerafarma.com.br], copia: [pedro@sogamax.com.br, yuritoso@sogamax.com.br], canais: [email]}
 
   - nome: DIFFUCAP
     codigo: 7142            # DIFFUCAP-CHEMOBRAS - (QUINTINO BOCAIUVA - RJ)
@@ -109,6 +133,7 @@ fabricantes:
 
   - nome: DIVCOM_RX
     codigo: 22999           # FARMOQUIMICA (RX - CAMPINA GRANDE - PB)
+    dias_semana: [segunda]
     contatos: {emails: [mapaulo@fqm.com.br], copia: [pedro@sogamax.com.br, yuritoso@sogamax.com.br], canais: [email]}
 
   # Linhas 8 e 9 da planilha: mesmo nome, codigos diferentes, sem " - " unindo.
@@ -116,11 +141,13 @@ fabricantes:
 
   - nome: EMS_BRACE_PHARMA_HORTOLANDIA
     codigo: 46961           # BRACE PHARMA - (HORTOLANDIA - SP)
+    dias_semana: [segunda]
     # eduardo.lucena@underskin.com.br atende 4 laboratorios deste grupo economico
     contatos: {emails: [eduardo.lucena@underskin.com.br], copia: [pedro@sogamax.com.br, yuritoso@sogamax.com.br], canais: [email]}
 
   - nome: EMS_BRACE_PHARMA_EXTREMA
     codigo: 61724           # BRACE PHARMA - (EXTREMA- MG)
+    dias_semana: [segunda]
     # eduardo.lucena@underskin.com.br atende 4 laboratorios deste grupo economico
     contatos: {emails: [eduardo.lucena@underskin.com.br], copia: [pedro@sogamax.com.br, yuritoso@sogamax.com.br], canais: [email]}
 
@@ -128,6 +155,7 @@ fabricantes:
 
   - nome: EMS_RX
     codigo: 46239           # EMS S/A
+    dias_semana: [segunda]
     # roberto.mattos@ems.com.br atende 2 laboratorios deste grupo economico
     contatos: {emails: [roberto.mattos@ems.com.br], copia: [pedro@sogamax.com.br, yuritoso@sogamax.com.br], canais: [email]}
 
@@ -136,28 +164,35 @@ fabricantes:
 
   - nome: EUROFARMA
     codigo: 14232           # MOMENTA FARMACEUTICA
+    dias_semana: [segunda]
     contatos: {emails: [janderson.venturin@momentafarma.com.br], copia: [pedro@sogamax.com.br, yuritoso@sogamax.com.br], canais: [email]}
 
   - nome: EUROFARMA_RX
     codigo: 13963           # EUROFARMA LABORATORIOS (RX)  — conferido contra o mapa manual
-    dias_semana: [segunda]
+    dias_semana: [segunda, quarta]
     contatos: {emails: [pedro.silva@eurofarma.com], copia: [pedro@sogamax.com.br, yuritoso@sogamax.com.br], canais: [email]}
 
   - nome: GERMED
     codigo: 5660            # GERMED (RX - HORTOLÂNDIA - SP)
+    dias_semana: [segunda]
     # eduardo.lucena@underskin.com.br atende 4 laboratorios deste grupo economico
     contatos: {emails: [eduardo.lucena@underskin.com.br], copia: [pedro@sogamax.com.br, yuritoso@sogamax.com.br], canais: [email]}
 
+  # A ENVIO MAPA.xlsx traz "kirian.cunha@herbamned.com.br" — "herbamned" e erro de digitacao:
+  # a planilha anterior e o proprio nome do laboratorio dizem herbamed.com.br. Mantido.
   - nome: HERBAMED
     codigo: 40333           # HERBAMED
+    dias_semana: [segunda]
     contatos: {emails: [kirian.cunha@herbamed.com.br], copia: [pedro@sogamax.com.br, yuritoso@sogamax.com.br], canais: [email]}
 
   - nome: KLEY_HERTZ
     codigo: 30314           # KLEY HERTZ DISTRIBUIDORA LTDA
+    dias_semana: [segunda]
     contatos: {emails: [mfigueiredo@hertzfarma.com.br], copia: [pedro@sogamax.com.br, yuritoso@sogamax.com.br], canais: [email]}
 
   - nome: LAFIMAN
     codigo: 39010           # LAFIMAN DISTRIBUIDORA DE MEDICAMENTOS LTDA
+    dias_semana: [segunda]
     # roberto.mattos@ems.com.br atende 2 laboratorios deste grupo economico
     contatos: {emails: [roberto.mattos@ems.com.br], copia: [pedro@sogamax.com.br, yuritoso@sogamax.com.br], canais: [email]}
 
@@ -166,6 +201,7 @@ fabricantes:
 
   - nome: LEGRAND
     codigo: 44425           # OFTA VISION HEALTH
+    dias_semana: [segunda]
     # eduardo.lucena@underskin.com.br atende 4 laboratorios deste grupo economico
     contatos: {emails: [eduardo.lucena@underskin.com.br], copia: [pedro@sogamax.com.br, yuritoso@sogamax.com.br], canais: [email]}
 
@@ -176,19 +212,23 @@ fabricantes:
 
   - nome: MEDQUIMICA
     codigo: 47658           # MEDQUIMICA INDUSTRIA FARMACEUTICA
+    dias_semana: [segunda]
     contatos: {emails: [thiagodomingues@lupin.com], copia: [pedro@sogamax.com.br, yuritoso@sogamax.com.br], canais: [email]}
 
   - nome: MYRALIS
     codigo: 104634          # MYRALIS INDÚSTRIA FARMACÊUTICA
+    dias_semana: [segunda]
     contatos: {emails: [elaine.silva@myralis.com.br], copia: [pedro@sogamax.com.br, yuritoso@sogamax.com.br], canais: [email]}
 
   - nome: ORGANON
     codigo: 52878           # ORGANON FARMACEUTICA LTDA.
+    dias_semana: [segunda]
     contatos: {emails: [paulo.sakakura@organon.com], copia: [pedro@sogamax.com.br, yuritoso@sogamax.com.br], canais: [email]}
 
   # DESATIVADO em 27/08/2026: parceria encerrada (Pedro). Mantido no arquivo de proposito —
   # `ativo: false` desliga a extracao e o envio, e reativar e trocar por `true`. Os relatorios
   # ja gerados continuam em disco, e o registro em estado.json nao foi mexido.
+  # Tambem nao consta da docs/ENVIO MAPA.xlsx de 15/09/2026.
   - nome: SANOFI_MEDLEY
     codigo: 21570           # SANOFI (RX - SUZANO - SP )
     ativo: false
@@ -197,14 +237,17 @@ fabricantes:
 
   - nome: SUPERA_RX
     codigo: 58650           # SUPERA RX
+    dias_semana: [segunda]
     contatos: {emails: [leandro.braga@superarx.com.br], copia: [pedro@sogamax.com.br, yuritoso@sogamax.com.br], canais: [email]}
 
   - nome: TORRENT
     codigos:
       - 21411               # TORRENT DO BRASIL LTDA (RX)
       - 54843               # TORRENT DO BRASIL LTDA (RX)
+    dias_semana: [segunda]
     contatos: {emails: [renato@torrent.com.br], copia: [pedro@sogamax.com.br, yuritoso@sogamax.com.br], canais: [email]}
 
   - nome: VIATRIS
     codigo: 46292           # VIATRIS FARMACEUTICA (GUARULHOS - SP)
+    dias_semana: [segunda]
     contatos: {emails: [Antonio.Barbara@viatris.com], copia: [pedro@sogamax.com.br, yuritoso@sogamax.com.br], canais: [email]}

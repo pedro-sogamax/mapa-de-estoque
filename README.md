@@ -148,8 +148,8 @@ códigos do Geweb.
 
 **Um laboratório pode ter vários códigos** — um por divisão/CD (RX, OTC, genérico, cada centro
 de distribuição). Como o campo Fabricante aceita múltipla escolha, todos entram no mesmo
-relatório. No cadastro atual são quatro casos assim, todos com dois códigos: `ACHE`,
-`BIOSINTETICA_RX`, `ASPEN` e `TORRENT` — os demais têm um só.
+relatório. No cadastro ativo são três casos assim, todos com dois códigos: `ACHE`,
+`BIOSINTETICA_RX` e `TORRENT` — os demais têm um só.
 
 ```yaml
 - nome: BIOPAS               # um código só
@@ -162,7 +162,7 @@ relatório. No cadastro atual são quatro casos assim, todos com dois códigos: 
 Quem manda nisso é a planilha do comprador: os códigos unidos por `" - "` na coluna
 `ID FABRICANTE` são os que entram **juntos** no mesmo relatório. Códigos em linhas
 separadas viram **arquivos separados**, mesmo quando o nome é igual (é o caso das duas
-unidades da Brace Pharma).
+unidades da Brace Pharma e dos dois códigos da CELLERA).
 
 Para achar os códigos, a lista completa dos 1140 fornecedores está em
 `logs\fabricantes-geweb.txt` (formato `(codigo) NOME`). Para atualizá-la:
@@ -173,7 +173,7 @@ Para achar os códigos, a lista completa dos 1140 fornecedores está em
 
 ### Agenda de envio: mensal + dias da semana
 
-O cadastro vem de [docs/FABRICANTES ENVIO MAPA.xlsx](docs/FABRICANTES%20ENVIO%20MAPA.xlsx),
+O cadastro vem de [docs/ENVIO MAPA.xlsx](docs/ENVIO%20MAPA.xlsx), a planilha do comprador,
 que define **dois envios independentes**. Um fabricante pode receber os dois:
 
 | Campo | Quando dispara | Período que o relatório cobre |
@@ -621,6 +621,16 @@ Telefone não existe na planilha, então o WhatsApp continua fora.
 Desses 24, **23 estão ativos**: a SANOFI_MEDLEY foi desligada em 27/08/2026 com `ativo: false`,
 por fim da parceria.
 
+**Atualizado em 15/09/2026** a partir de [docs/ENVIO MAPA.xlsx](docs/ENVIO%20MAPA.xlsx), que
+passa a ser a planilha de referência (dias de envio e e-mail na mesma tabela):
+
+- todos os laboratórios passam a receber também o **semanal de segunda**; EUROFARMA_RX e
+  MARJAN recebem ainda na **quarta**;
+- entra a **CELLERA**, com dois códigos em linhas separadas — dois relatórios, o mesmo contato;
+- sai a **ASPEN**, desligada com `ativo: false` (como a SANOFI_MEDLEY, fica no arquivo).
+
+São **24 ativos**, com 19 endereços distintos.
+
 > ⚠️ Isso mudou a natureza da proteção. Antes, um mapa não podia chegar a fornecedor porque
 > **nenhum endereço de fornecedor existia** no projeto. Agora existem, e a única coisa entre o
 > sistema e as indústrias é o `DESTINATARIO_TESTE` no `.env` — esvaziá-lo é a ação que libera
@@ -628,8 +638,8 @@ por fim da parceria.
 
 Dois contatos atendem mais de um laboratório do mesmo grupo econômico:
 `eduardo.lucena@underskin.com.br` cobre as duas Brace Pharma, GERMED e LEGRAND, e
-`roberto.mattos@ems.com.br` cobre EMS_RX e LAFIMAN. São 20 endereços distintos para 24
-laboratórios, e o `--dry-run` avisa quem recebe mais de uma mensagem na leva.
+`roberto.mattos@ems.com.br` cobre EMS_RX e LAFIMAN, e `leonardo.souza@cellerafarma.com.br`
+as duas entradas da CELLERA. O `--dry-run` avisa quem recebe mais de uma mensagem na leva.
 
 O cadastro fica no [fabricantes.yaml](fabricantes.yaml):
 

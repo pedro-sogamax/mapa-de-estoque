@@ -1,6 +1,6 @@
 """Decide QUAIS relatorios a rodada de hoje deve gerar.
 
-A planilha "FABRICANTES ENVIO MAPA.xlsx" define dois envios independentes:
+A planilha "docs/ENVIO MAPA.xlsx" define dois envios independentes:
 
 * mensal  — todos os fabricantes, a partir do 1o dia util do mes, cobrindo o mes anterior;
 * semanal — so quem tem X num dia da semana, cobrindo o mes corrente ate ontem.

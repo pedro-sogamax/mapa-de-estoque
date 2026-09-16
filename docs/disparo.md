@@ -46,6 +46,8 @@ acrescentou a coluna `E-MAIL`, e os 24 laboratórios foram cadastrados no `fabri
 (um e-mail cada, cópia para o Pedro e o YURI, canal e-mail). Em 27/08/2026 a SANOFI_MEDLEY foi
 desligada com `ativo: false` (parceria encerrada), deixando **23 ativos**. A planilha antiga
 `FABRICANTES ENVIO MAPA.xlsx` — só FABRICANTE, ID, COMPRADOR e dias da semana — ficou obsoleta.
+Em 15/09/2026 as duas foram substituídas por `ENVIO MAPA.xlsx`, com dias e e-mail juntos: todos
+passam a ter semanal de segunda, entra a CELLERA e a ASPEN é desligada — **24 ativos**.
 As credenciais de SMTP também já estão no `.env`.
 
 O que ainda **não existe**: telefone de ninguém, e a contratação do provedor de WhatsApp. O
