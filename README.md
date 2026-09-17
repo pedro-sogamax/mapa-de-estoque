@@ -1,13 +1,62 @@
-# Mapa de Estoque — extração automática do Geweb
+# Mapa de Estoque
 
-Automatiza o passo descrito em [docs/mapa.md](docs/mapa.md): gerar e baixar o relatório
-**Compras/Vendas por Produto → Relatório Mensal (Compras/Venda Varejo)** no Geweb, para cada
-fabricante, sem clicar em nada.
+Gera os relatórios de estoque no ERP **Geweb**, formata cada um em Excel e os entrega às
+indústrias parceiras por e-mail — sem ninguém clicar em nada.
 
-Os arquivos saem **já formatados**, e `python -m src.disparo` os entrega às indústrias por
-e-mail e WhatsApp — com confirmação antes, rodado por uma pessoa. Para a rodada agendada
-entregar sozinha, o `--enviar` encadeia o disparo ao fim da extração, **só pelo e-mail** e
-sem perguntar. O desenho completo do envio está em [docs/disparo.md](docs/disparo.md).
+O trabalho que isso substitui: abrir o Geweb, preencher o filtro de um fabricante, gerar o
+relatório, abrir o `.xls` no Excel, formatar coluna a coluna, anexar num e-mail e enviar.
+Quarenta e seis vezes por semana, entre quatro compradores.
+
+## Em números
+
+| | |
+|---|---|
+| Laboratórios ativos | **46**, em 4 carteiras de compradores |
+| Códigos do Geweb | 60, somados em 46 relatórios |
+| Destinatários | 39 endereços de indústria |
+| Rodada mais pesada | segunda-feira — 46 relatórios em ~3min40 |
+| Canais | e-mail (em uso) e WhatsApp (implementado, sem credencial) |
+
+## O fluxo
+
+```
+  Geweb                formatador           agenda              disparo
+  (Playwright)         (openpyxl)           (calendário)        (SMTP / API)
+      |                     |                    |                   |
+  login, menus          .xls do Geweb      quem recebe hoje     e-mail com anexo,
+  e filtros por      -> (HTML) vira     -> e de que período  -> travas, cotas e
+  código                .xlsx formatado     (mensal/semanal)     registro por envio
+      |                                                              |
+      +--------> ownCloud\Mapa de Estoque\<COMPRADOR>\<LAB>\<mês>\ <-+
+                                    |
+                                    +-- logs\<AAAA-MM>.xlsx   (o que saiu e o que falhou)
+```
+
+## Por onde começar
+
+| Se você quer... | Vá para |
+|---|---|
+| instalar pela primeira vez | [1. Instalação](#1-instalação-uma-vez) |
+| ajustar o que o script clica no Geweb | [2. Seletores do Geweb](#2-seletores-do-geweb) |
+| incluir, tirar ou mudar um laboratório | [3. Cadastrar os fabricantes](#3-cadastrar-os-fabricantes) |
+| rodar uma extração agora | [4. Usar](#4-usar) |
+| entender ou mexer no envio | [5. Enviar às indústrias](#5-enviar-às-indústrias) |
+| deixar rodando sozinho | [6. Agendar no Windows](#6-agendar-no-windows) |
+| saber o que deu certo e errado num dia | [O histórico, em Excel](#o-histórico-em-excel) |
+
+O desenho completo do envio está em [docs/disparo.md](docs/disparo.md), e o passo manual que
+deu origem a tudo isso, em [docs/mapa.md](docs/mapa.md).
+
+## Quatro coisas que evitam susto
+
+- **Rodar de novo não duplica.** Dez execuções no mesmo dia geram e enviam uma vez só.
+- **Dia perdido se recupera.** Máquina desligada no 1º dia útil não faz o mensal sumir em
+  silêncio — a próxima rodada o gera, avisando no log.
+- **Falha isolada não derruba a rodada.** Um laboratório com problema fica de fora, nomeado
+  no resumo e num e-mail de alerta; os demais seguem.
+- **`DESTINATARIO_TESTE` no `.env` é a única coisa entre o sistema e as indústrias.**
+  Preenchido, tudo vai para você. Esvaziá-lo é a ação que libera o envio real — confira antes
+  com `python -m src.disparo --dry-run`.
 
 ---
 
@@ -26,7 +75,7 @@ copy .env.example .env
 notepad .env
 ```
 
-São vinte e oito chaves, lidas por [src/config.py](src/config.py):
+São trinta e duas chaves, lidas por [src/config.py](src/config.py):
 
 | Variável | Obrigatória | Padrão | Para que serve |
 |---|---|---|---|
@@ -148,8 +197,10 @@ códigos do Geweb.
 
 **Um laboratório pode ter vários códigos** — um por divisão/CD (RX, OTC, genérico, cada centro
 de distribuição). Como o campo Fabricante aceita múltipla escolha, todos entram no mesmo
-relatório. No cadastro ativo são três casos assim, todos com dois códigos: `ACHE`,
-`BIOSINTETICA_RX` e `TORRENT` — os demais têm um só.
+relatório. No cadastro ativo são **nove casos assim**, de dois a quatro códigos cada —
+`ACHE`, `BIOSINTETICA_RX`, `TORRENT`, `CRISTALIA`, `EUROFARMA_GENERICOS`, `GERMED_GENERICOS`,
+`LEGRAND_GENERICO`, `MEDLEY_GENERICOS` e `NOVA_QUIMICA`. Os outros 37 têm um código só, e no
+total são 60 códigos do Geweb em 46 relatórios.
 
 ```yaml
 - nome: BIOPAS               # um código só
@@ -164,7 +215,7 @@ Quem manda nisso é a planilha do comprador: os códigos unidos por `" - "` na c
 separadas viram **arquivos separados**, mesmo quando o nome é igual (é o caso das duas
 unidades da Brace Pharma e dos dois códigos da CELLERA).
 
-Para achar os códigos, a lista completa dos 1140 fornecedores está em
+Para achar os códigos, a lista completa dos 1150 fornecedores está em
 `logs\fabricantes-geweb.txt` (formato `(codigo) NOME`). Para atualizá-la:
 
 ```powershell
@@ -243,7 +294,7 @@ São Paulo, troque `holidays.Brazil()` por `holidays.Brazil(subdiv="SP")` em
 
 ### O mensal se recupera sozinho
 
-Se a rotina dependesse só da data, uma máquina desligada no 1º dia útil faria os 24 mapas do
+Se a rotina dependesse só da data, uma máquina desligada no 1º dia útil faria os 43 mapas do
 mês **não saírem — em silêncio**, porque no dia seguinte a checagem de data recusaria a
 rodada. É a pior falha possível numa automação: você para de conferir justamente porque
 confia nela.
@@ -555,7 +606,7 @@ entra na leva o que tem arquivo.
    resolver o mesmo problema. Com a trava ligada, o campo `copia` de cada laboratório é
    **suprimido** junto: ninguém de fora entra na mensagem por nenhuma via.
 4. **`envios.json`.** O que já foi entregue não é reenviado. O registro é gravado **a cada
-   mensagem**, não no fim: se o comando morrer na décima de vinte e quatro, as nove que saíram
+   mensagem**, não no fim: se o comando morrer na décima de quarenta e seis, as nove que saíram
    ficam registradas. `--refazer` ignora isso, de propósito.
 
 ### Proteções contra descontrole
@@ -663,33 +714,52 @@ documentação oficial dele — os nomes dos campos divergem entre provedores.
 
 ### Cadastrar os contatos
 
-**Cadastrado em 26/08/2026**, a partir da coluna `E-MAIL` de
-[docs/Fabricantes atualizado.xlsx](docs/Fabricantes%20atualizado.xlsx): os 24 laboratórios têm
-e-mail, todos com `copia: [pedro@sogamax.com.br, yuritoso@sogamax.com.br]` e `canais: [email]`.
-Telefone não existe na planilha, então o WhatsApp continua fora.
+O cadastro de contatos tem uma linha do tempo, e ela explica por que o arquivo está como
+está hoje.
 
-Desses 24, **23 estão ativos**: a SANOFI_MEDLEY foi desligada em 27/08/2026 com `ativo: false`,
-por fim da parceria.
+**26/08/2026** — a partir da coluna `E-MAIL` de
+[docs/Fabricantes atualizado.xlsx](docs/Fabricantes%20atualizado.xlsx), os 24 laboratórios de
+então ganharam e-mail, todos com `copia: [pedro@sogamax.com.br, yuritoso@sogamax.com.br]` e
+`canais: [email]`. Telefone não existia na planilha, e por isso o WhatsApp ficou de fora.
 
-**Atualizado em 15/09/2026** a partir de [docs/ENVIO MAPA.xlsx](docs/ENVIO%20MAPA.xlsx), que
-passa a ser a planilha de referência (dias de envio e e-mail na mesma tabela):
+**27/08/2026** — a SANOFI_MEDLEY foi desligada com `ativo: false`, por fim da parceria.
+
+**15/09/2026** — [docs/ENVIO MAPA.xlsx](docs/ENVIO%20MAPA.xlsx) passou a ser a planilha de
+referência (dias de envio e e-mail na mesma tabela):
 
 - todos os laboratórios passam a receber também o **semanal de segunda**; EUROFARMA_RX e
   MARJAN recebem ainda na **quarta**;
 - entra a **CELLERA**, com dois códigos em linhas separadas — dois relatórios, o mesmo contato;
 - sai a **ASPEN**, desligada com `ativo: false` (como a SANOFI_MEDLEY, fica no arquivo).
 
-São **24 ativos**, com 19 endereços distintos.
+**16/09/2026** — a mesma planilha passou a trazer a coluna `COMPRADOR` preenchida para
+quatro pessoas. Entraram 22 laboratórios novos e saiu a PRINCIPIA, a pedido da compradora —
+com ela, a quinta-feira voltou a ser um dia sem envio.
+
+São **46 ativos**, com 39 endereços distintos, distribuídos assim:
+
+| Comprador | Laboratórios |
+|---|---|
+| Yuri Toso | 24 |
+| Geliana Ferreira | 11 |
+| Joici Rangel | 8 |
+| Mikely Tamy | 3 |
 
 > ⚠️ Isso mudou a natureza da proteção. Antes, um mapa não podia chegar a fornecedor porque
 > **nenhum endereço de fornecedor existia** no projeto. Agora existem, e a única coisa entre o
 > sistema e as indústrias é o `DESTINATARIO_TESTE` no `.env` — esvaziá-lo é a ação que libera
 > o envio real. Confira sempre com `--dry-run` antes.
 
-Dois contatos atendem mais de um laboratório do mesmo grupo econômico:
-`eduardo.lucena@underskin.com.br` cobre as duas Brace Pharma, GERMED e LEGRAND, e
-`roberto.mattos@ems.com.br` cobre EMS_RX e LAFIMAN, e `leonardo.souza@cellerafarma.com.br`
-as duas entradas da CELLERA. O `--dry-run` avisa quem recebe mais de uma mensagem na leva.
+Alguns contatos atendem mais de um laboratório do mesmo grupo econômico:
+`eduardo.lucena@underskin.com.br` cobre as duas Brace Pharma, GERMED e LEGRAND;
+`roberto.mattos@ems.com.br` cobre EMS_RX e LAFIMAN; `leonardo.souza@cellerafarma.com.br`, as
+duas entradas da CELLERA; e `jana.romano@blau.com`, BLAU e BERGAMO. O `--dry-run` avisa quem
+recebe mais de uma mensagem na leva.
+
+> Um caso novo com o multicomprador: `davi.bertolini@merckgroup.com` recebe **dois mapas de
+> compradores diferentes** — MERCK_RX é da Joici e MERCK_GENERICOS é da Geliana. Ele vai ver
+> duas mensagens assinadas por pessoas distintas da mesma empresa. É proposital, mas as duas
+> compradoras precisam saber.
 
 O cadastro fica no [fabricantes.yaml](fabricantes.yaml):
 
@@ -719,9 +789,10 @@ Cada laboratório já tem a linha modelo comentada, é só descomentar e preench
 
 ### Mais de um comprador
 
-`COMPRADOR` e `RESPONDER_PARA` no `.env` valem para o projeto inteiro. Hoje isso basta —
-os 24 laboratórios são do YURI TOSO. Quando entrar um laboratório de outro comprador, o
-bloco `comprador` sobrepõe os dois **naquele laboratório**:
+`COMPRADOR` e `RESPONDER_PARA` no `.env` são o padrão do projeto. **Desde 16/09/2026 são
+quatro compradores**, e todo laboratório traz um bloco `comprador` que sobrepõe os dois
+naquele laboratório — é ele que decide quem assina a mensagem, quem recebe a resposta e em
+qual pasta o relatório é gravado:
 
 ```yaml
   - nome: ACHE
@@ -923,14 +994,23 @@ O que sai em cada dia:
 
 | Dia | Gera | Duração |
 |---|---|---|
-| 1º dia útil do mês | 23 mensais do mês anterior | ~1min30 |
-| Segunda | 3 semanais (DIFFUCAP, EUROFARMA_RX, MARJAN) | ~20 s |
-| Quarta | 1 semanal (MARJAN) | ~7 s |
+| 1º dia útil do mês | 43 mensais do mês anterior | ~3min30 |
+| Segunda | 46 semanais — **todos** | ~3min40 |
+| Quarta | 2 semanais (EUROFARMA_RX, MARJAN) | ~10 s |
 | Terça, quinta e sexta | nada | 0,4 s |
 
-> A SANOFI_MEDLEY saiu da agenda em 27/08/2026 (parceria encerrada) — está no
-> `fabricantes.yaml` com `ativo: false`, o que a tira da extração e do envio sem apagar o
-> cadastro. Era a única de quinta-feira, e por isso aquele dia ficou vazio.
+Três laboratórios não têm mensal e só recebem o semanal de segunda — `BAYER_OTC`,
+`EUROFARMA_OTC` e `NOVA_QUIMICA` —, e é por isso que o 1º dia útil gera 43 e não 46.
+
+> ⚠️ **A segunda-feira é a maior leva do sistema.** São 46 mensagens numa rodada, contra a
+> cota de 90/hora e o limite de 100/hora por caixa da Locaweb. Cabe, mas sem folga para
+> imprevisto: uma segunda que também recupere um mensal atrasado pede 89 mensagens. Veja
+> *Proteções contra descontrole*.
+
+> **Quinta e sexta são dias sem envio.** A SANOFI_MEDLEY saiu da agenda em 27/08/2026
+> (parceria encerrada) e era a única de quinta; a PRINCIPIA, que a substituiu no dia, foi
+> retirada em 16/09/2026 a pedido da Mikely. As duas continuam no `fabricantes.yaml` — a
+> primeira com `ativo: false`, que a tira da extração e do envio sem apagar o cadastro.
 
 > **Máquina desligada no dia certo não é problema para o mensal** — a próxima rodada
 > recupera (veja *O mensal se recupera sozinho*). Já um envio **semanal** perdido não é
