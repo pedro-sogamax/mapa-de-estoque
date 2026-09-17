@@ -30,7 +30,7 @@ from dataclasses import dataclass
 from datetime import date
 from pathlib import Path
 
-from src import alerta
+from src import alerta, historico
 from src.agenda import Tarefa, tarefas_com_periodo_fixo, tarefas_do_dia
 from src.config import (
     RAIZ_PROJETO,
@@ -39,6 +39,7 @@ from src.config import (
     Fabricante,
     carregar_config,
     carregar_fabricantes_com_problemas,
+    nome_do_comprador,
 )
 from src.estado import EstadoDaAgenda
 from src.formatador import caminho_formatado, formatar
@@ -85,11 +86,6 @@ def _nome_de_pasta(nome: str) -> str:
     return _CARACTERES_INVALIDOS.sub("-", nome).strip() or "sem-nome"
 
 
-def _nome_do_comprador(fabricante: Fabricante, cfg: Config) -> str:
-    """De quem e este laboratorio: o bloco `comprador` dele, ou o COMPRADOR do .env."""
-    return (fabricante.comprador.nome if fabricante.comprador else "") or cfg.comprador
-
-
 def _pasta_do_comprador(fabricante: Fabricante, cfg: Config) -> str:
     """Nome da pasta que agrupa os laboratorios de um comprador.
 
@@ -98,7 +94,7 @@ def _pasta_do_comprador(fabricante: Fabricante, cfg: Config) -> str:
     blocos. Sem nenhum dos dois o relatorio ainda sai, numa pasta que denuncia a falta em
     vez de espalhar arquivo solto.
     """
-    nome = _nome_do_comprador(fabricante, cfg)
+    nome = nome_do_comprador(fabricante, cfg)
     return _nome_de_pasta(nome) if nome.strip() else "SEM_COMPRADOR"
 
 
@@ -290,6 +286,37 @@ def _disparar_email(quantos: int) -> int:
         return CODIGO_FALHA_DE_ENVIO
 
 
+def _registrar_historico(
+    cfg: Config, fabricantes: list[Fabricante], resultados: list[Resultado]
+) -> None:
+    """Anota a extracao no historico e reescreve as planilhas do FORMATADO_DIR/logs.
+
+    Registra o desfecho de CADA tarefa, inclusive o que falhou — e a diferenca entre um log
+    que mostra so sucesso e um que serve para conferir o dia.
+    """
+    de_quem = {f.nome: nome_do_comprador(f, cfg) for f in fabricantes}
+    eventos = []
+    for resultado in resultados:
+        if resultado.erro:
+            desfecho, motivo = "falha", resultado.erro
+        elif resultado.formatado is None and resultado.arquivo is None:
+            desfecho, motivo = "sem dados", resultado.aviso or "sem movimento no periodo"
+        else:
+            desfecho, motivo = "ok", (resultado.aviso or "")
+        entregue = resultado.formatado or resultado.arquivo
+        eventos.append(
+            historico.evento_extracao(
+                comprador=de_quem.get(resultado.fabricante, cfg.comprador),
+                laboratorio=resultado.fabricante,
+                periodo=resultado.rotulo or resultado.periodo,
+                resultado=desfecho,
+                motivo=motivo,
+                arquivo=entregue.name if entregue else "",
+            )
+        )
+    historico.atualizar(cfg.historico_path, cfg.historico_dir, eventos)
+
+
 def _imprimir_resumo(resultados: list[Resultado]) -> None:
     sucessos = [r for r in resultados if r.ok]
     sem_formatar = [r for r in resultados if r.aviso]
@@ -457,8 +484,8 @@ def main(argv: list[str] | None = None) -> int:
 
     if args.comprador:
         alvos = {p.strip().casefold() for p in args.comprador.split(",") if p.strip()}
-        conhecidos = sorted({_nome_do_comprador(f, cfg) for f in fabricantes})
-        fabricantes = [f for f in fabricantes if _nome_do_comprador(f, cfg).casefold() in alvos]
+        conhecidos = sorted({nome_do_comprador(f, cfg) for f in fabricantes})
+        fabricantes = [f for f in fabricantes if nome_do_comprador(f, cfg).casefold() in alvos]
         if not fabricantes:
             log.error(
                 "Nenhum fabricante ativo para %r. Compradores no cadastro: %s",
@@ -512,6 +539,7 @@ def main(argv: list[str] | None = None) -> int:
 
     itens = _registrar_rodada(cfg, resultados)
     _imprimir_resumo(resultados)
+    _registrar_historico(cfg, fabricantes, resultados)
     codigo = 0 if all(r.ok for r in resultados) else 1
 
     if not args.enviar:

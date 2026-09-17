@@ -290,6 +290,9 @@ os fabricantes — é o modo de refazer um mapa antigo.
 # um fabricante, um mês — use este para conferir os números
 .venv\Scripts\python -m src.main --fabricante EUROFARMA_RX --mes 2026-07
 
+# a carteira de um comprador (aceita vários, separados por vírgula)
+.venv\Scripts\python -m src.main --comprador "Joici Rangel, Mikely Tamy" --mes 2026-08
+
 # período livre, para todos os fabricantes
 .venv\Scripts\python -m src.main --inicio 2026-07-01 --fim 2026-07-07
 
@@ -374,7 +377,49 @@ relatório sair com o mesmo nome de outro. O contador fica em `sequencia.json`, 
 - **se recompõe sozinho** — apagado o `sequencia.json`, ele varre `downloads\` e `formatado\`
   e retoma do maior número existente, para nunca reaproveitar um número já usado.
 
-Log: `logs\execucao.log` — acumula todas as rodadas, sem rotação.
+Log: `logs\execucao.log` — a narrativa da rodada, com rotação (1 MB × 5 gerações).
+
+### O histórico, em Excel
+
+Para saber **o que deu certo e o que deu errado num dia** sem ler log de texto, cada rodada
+grava um evento por laboratório em `logs\historico.jsonl` e reescreve uma planilha por mês
+dentro do próprio `FORMATADO_DIR`:
+
+```
+ownCloud\Mapa de Estoque\logs6-09.xlsx
+```
+
+Três abas, todas com cabeçalho congelado e autofiltro — o comprador acha a própria carteira
+filtrando a coluna `COMPRADOR`, e por isso é um arquivo só para todos:
+
+| Aba | Uma linha por | Colunas |
+|---|---|---|
+| `Envios` | mensagem | data, hora, comprador, laboratório, período, canal, destinatário, **resultado**, **motivo**, id |
+| `Extracoes` | relatório | data, hora, comprador, laboratório, período, **resultado**, **motivo**, arquivo |
+| `Rodadas` | dia + etapa | data, etapa, ok, falha, não tentado, total |
+
+O `resultado` é `ok`, `falha` ou `nao tentado` (e `sem dados`, na extração) — **o que não
+saiu é registrado junto com o motivo**. É a diferença entre um log que mostra só sucesso,
+e que por isso parece sempre dizer que está tudo bem, e um que serve para conferir o dia.
+
+> Por que um arquivo novo e não o `logs\envios.jsonl`: aquele alimenta a **cota horária**,
+> que conta uma linha por mensagem. Registrar falhas ali faria a cota contar mensagens que
+> nunca saíram e apertar o limite sem motivo. Os dois propósitos são diferentes — um é
+> contador de defesa, o outro é memória do que aconteceu.
+
+**A planilha é uma projeção, não a fonte da verdade.** Se alguém deixar o `.xlsx` aberto no
+Excel, o Windows trava a gravação: a rodada apenas avisa e segue, porque o dado já está no
+`.jsonl` e a planilha é refeita inteira no comando seguinte. Para refazer na hora, sem rodar
+extração nenhuma:
+
+```powershell
+.venv\Scripts\python -m src.historico
+```
+
+> ⚠️ O nome da planilha **não pode começar com número seguido de `_`**. A pasta fica dentro
+> do `FORMATADO_DIR`, e o [src/sequencia.py](src/sequencia.py) conta qualquer arquivo assim
+> como relatório numerado — o contador passaria a pular números. `2026-09.xlsx` é seguro, e
+> há teste cobrindo isso.
 
 Códigos de saída:
 
@@ -799,6 +844,7 @@ cargo e telefones do padrão.
 | `--sim` | não pergunta antes de enviar |
 | `--periodo 2026-07` | envia uma leva antiga, varrendo o `FORMATADO_DIR` |
 | `--fabricante MARJAN` | só um laboratório |
+| `--comprador "Joici Rangel"` | só a carteira desses compradores — aceita vários, separados por vírgula |
 | `--canal email` / `--canal whatsapp` | só um canal |
 | `--refazer` | reenvia o que já foi enviado |
 | `--rascunho` | **não envia**: grava os `.eml` e a página `wa.me` para envio manual |
@@ -991,4 +1037,5 @@ completo que o `--planejar`.
 | [src/descobrir.py](src/descobrir.py) | Diagnóstico da tela e extração da lista de fornecedores — não faz parte da rodada |
 | [src/alerta.py](src/alerta.py) | Avisa por e-mail quando a rodada não termina limpa |
 | [src/log.py](src/log.py) | Configuração única do log, com rotação (1 MB × 5 gerações) |
+| [src/historico.py](src/historico.py) | Histórico estruturado das rodadas e as planilhas mensais que os compradores abrem |
 | [tests/](tests/) | Testes de `periodo`, `agenda`, validação do cadastro e alerta |

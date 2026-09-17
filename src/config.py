@@ -45,6 +45,8 @@ class Config:
     rodada_path: Path
     envios_path: Path
     envios_historico_path: Path
+    historico_path: Path
+    historico_dir: Path
     headless: bool
     timeout_ms: int
     timeout_relatorio_ms: int
@@ -192,6 +194,16 @@ class Fabricante:
         partes = ["mensal"] if self.mensal else []
         partes += [f"semanal({'+'.join(self.dias_semana)})"] if self.dias_semana else []
         return " ".join(partes) or "nenhum envio"
+
+
+def nome_do_comprador(fabricante: Fabricante, cfg: Config) -> str:
+    """De quem e este laboratorio: o bloco `comprador` dele, ou o COMPRADOR do .env.
+
+    Usada pela extracao (pasta de saida e --comprador) e pelo disparo (--comprador). As duas
+    precisam concordar: se divergirem, o mapa cai na pasta de um comprador e e enviado como
+    se fosse de outro.
+    """
+    return (fabricante.comprador.nome if fabricante.comprador else "") or cfg.comprador
 
 
 def _lista_de_textos(bruto: object) -> list[str]:
@@ -376,6 +388,11 @@ def carregar_config(headless_override: bool | None = None) -> Config:
         envios_path=RAIZ_PROJETO / "envios.json",
         # Historico append-only: conta a cota horaria e serve de auditoria do que saiu.
         envios_historico_path=RAIZ_PROJETO / "logs" / "envios.jsonl",
+        # Historico legivel das rodadas: o jsonl e a fonte, as planilhas sao projecao dele.
+        # Ficam DENTRO do FORMATADO_DIR, numa pasta "logs", para chegarem aos compradores
+        # pela mesma sincronizacao que ja leva os mapas.
+        historico_path=RAIZ_PROJETO / "logs" / "historico.jsonl",
+        historico_dir=formatado_dir / "logs",
         headless=headless,
         timeout_ms=_ler_int("TIMEOUT_MS", 30_000),
         timeout_relatorio_ms=_ler_int("TIMEOUT_RELATORIO_MS", 180_000),

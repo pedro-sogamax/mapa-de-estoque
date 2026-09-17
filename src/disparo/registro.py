@@ -62,6 +62,11 @@ class RegistroDeEnvios:
         entrada = self._enviados.get(self.chave(fabricante, rotulo, canal))
         return entrada.get("em") if entrada else None
 
+    def identificador(self, fabricante: str, rotulo: str, canal: str) -> str:
+        """O id que o provedor devolveu (Message-ID do SMTP). Vazio se nao houver."""
+        entrada = self._enviados.get(self.chave(fabricante, rotulo, canal))
+        return entrada.get("id", "") if entrada else ""
+
     def registrar(self, fabricante: str, rotulo: str, canal: str, identificador: str) -> None:
         """Marca como entregue e grava na hora — uma queda depois disto nao reenvia."""
         self._enviados[self.chave(fabricante, rotulo, canal)] = {

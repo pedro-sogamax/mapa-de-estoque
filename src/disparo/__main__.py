@@ -29,6 +29,7 @@ from dataclasses import dataclass
 from datetime import date
 from pathlib import Path
 
+from src import historico
 from src.config import (
     Comprador,
     Config,
@@ -37,6 +38,7 @@ from src.config import (
     Fabricante,
     carregar_config,
     carregar_fabricantes,
+    nome_do_comprador,
 )
 from src.disparo.canais.base import Canal, Destino, Envio, FalhaFatal, FalhaNoEnvio, Mensagem
 from src.disparo.canais.email_smtp import CanalEmail
@@ -372,6 +374,10 @@ def _parsear_argumentos(argv: list[str] | None = None) -> argparse.Namespace:
     )
     parser.add_argument("--periodo", help="Rotulo do periodo (ex.: 2026-07). Padrao: a ultima rodada.")
     parser.add_argument("--fabricante", help="So este laboratorio.")
+    parser.add_argument(
+        "--comprador",
+        help="So os laboratorios destes compradores. Aceita varios, separados por virgula.",
+    )
     parser.add_argument("--canal", choices=("email", "whatsapp"), help="Restringe a um canal.")
     parser.add_argument("--dry-run", action="store_true", help="Mostra o que enviaria e sai.")
     parser.add_argument("--sim", action="store_true", help="Nao pergunta antes de enviar.")
@@ -414,6 +420,19 @@ def main(argv: list[str] | None = None) -> int:
             cfg.rodada_path.name,
         )
         return 0
+
+    if args.comprador:
+        alvos = {p.strip().casefold() for p in args.comprador.split(",") if p.strip()}
+        de_quem = {f.nome: nome_do_comprador(f, cfg) for f in fabricantes}
+        conhecidos = sorted(set(de_quem.values()))
+        itens = [i for i in itens if de_quem.get(i.fabricante, "").casefold() in alvos]
+        if not itens:
+            log.error(
+                "Nenhum laboratorio de %r nesta leva. Compradores no cadastro: %s",
+                args.comprador,
+                ", ".join(conhecidos) or "(nenhum)",
+            )
+            return 2
 
     if args.fabricante:
         alvo = args.fabricante.strip().casefold()
@@ -492,6 +511,8 @@ def main(argv: list[str] | None = None) -> int:
         log.error("Nada foi enviado.")
         return CODIGO_FALHA_DE_ENVIO
 
+    _registrar_historico(cfg, fabricantes, registro, enviados, falhas, barrados)
+
     log.info("-" * 72)
     log.info("RESUMO — %d de %d entregues", len(enviados), len(a_enviar))
     for passo, erro in falhas:
@@ -503,6 +524,42 @@ def main(argv: list[str] | None = None) -> int:
             log.info("  %-28s %-9s %s", passo.item.fabricante, passo.canal, motivo)
     log.info("-" * 72)
     return CODIGO_FALHA_DE_ENVIO if (falhas or barrados) else 0
+
+
+def _registrar_historico(
+    cfg: Config,
+    fabricantes: list[Fabricante],
+    registro: RegistroDeEnvios,
+    enviados: list[Passo],
+    falhas: list[tuple[Passo, str]],
+    barrados: list[tuple[Passo, str]],
+) -> None:
+    """Anota o envio no historico e reescreve as planilhas do FORMATADO_DIR/logs.
+
+    Registra as tres saidas, nao so a entrega: o que falhou e o que nem chegou a ser
+    tentado sao justamente o que alguem precisa achar no dia seguinte. O logs/envios.jsonl
+    continua so com o que saiu — e ele que alimenta a cota horaria.
+    """
+    de_quem = {f.nome: nome_do_comprador(f, cfg) for f in fabricantes}
+
+    def evento(passo: Passo, desfecho: str, motivo: str = "") -> dict:
+        return historico.evento_envio(
+            comprador=de_quem.get(passo.item.fabricante, cfg.comprador),
+            laboratorio=passo.item.fabricante,
+            periodo=passo.item.rotulo,
+            canal=passo.canal,
+            destinatario=passo.alvo,
+            resultado=desfecho,
+            motivo=motivo,
+            identificador=registro.identificador(
+                passo.item.fabricante, passo.item.rotulo, passo.canal
+            ),
+        )
+
+    eventos = [evento(passo, "ok") for passo in enviados]
+    eventos += [evento(passo, "falha", erro) for passo, erro in falhas]
+    eventos += [evento(passo, "nao tentado", motivo) for passo, motivo in barrados]
+    historico.atualizar(cfg.historico_path, cfg.historico_dir, eventos)
 
 
 def _executar_rascunho(
