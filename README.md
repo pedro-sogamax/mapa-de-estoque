@@ -301,7 +301,7 @@ rodada. É a pior falha possível numa automação: você para de conferir justa
 confia nela.
 
 Por isso a condição real não é "hoje é o 1º dia útil", e sim **"o mês anterior ainda não foi
-entregue a este fabricante"**. O registro fica em `estado.json`, na raiz:
+entregue a este fabricante"**. O registro fica em `dados\estado.json`:
 
 ```json
 { "mensal": { "ACHE": "2026-07", "ASPEN": "2026-07" } }
@@ -421,7 +421,7 @@ do mês fica no mês em que começa. O número sequencial garante que nenhum arq
 outro, e o `--periodo` do disparo lê o período pelo nome do arquivo, não pela pasta.
 
 **Numeração sequencial** — cada arquivo recebe um número único e crescente, para nenhum
-relatório sair com o mesmo nome de outro. O contador fica em `sequencia.json`, na raiz, e:
+relatório sair com o mesmo nome de outro. O contador fica em `dados\sequencia.json`, e:
 
 - **sobrevive entre execuções** — reextrair o mesmo fabricante e período gera um arquivo
   novo (`0001_...` e `0003_...` convivem), preservando o histórico;

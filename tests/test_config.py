@@ -484,3 +484,61 @@ class TestCadastroReal:
         for f in fabricantes:
             assert f.codigos, f"{f.nome} sem codigo do Geweb"
             assert f.mensal or f.dias_semana, f"{f.nome} nao tem envio nenhum"
+
+
+class TestMigracaoDoEstado:
+    """O estado saiu da raiz para dados/. O que importa e nunca deixar a automacao ler um
+    envios.json vazio no lugar novo enquanto o de verdade continua na raiz — ela acharia que
+    nada foi entregue e mandaria tudo de novo as industrias."""
+
+    def test_move_da_raiz_para_dados_preservando_o_conteudo(self, tmp_path):
+        from src.config import migrar_estado
+
+        (tmp_path / "envios.json").write_text('{"ACHE": "ok"}', encoding="utf-8")
+        migrar_estado(tmp_path, tmp_path / "dados", ("envios.json",))
+
+        assert not (tmp_path / "envios.json").exists()
+        assert (tmp_path / "dados" / "envios.json").read_text(encoding="utf-8") == '{"ACHE": "ok"}'
+
+    def test_segunda_vez_nao_faz_nada(self, tmp_path):
+        from src.config import migrar_estado
+
+        (tmp_path / "estado.json").write_text("{}", encoding="utf-8")
+        migrar_estado(tmp_path, tmp_path / "dados", ("estado.json",))
+        migrar_estado(tmp_path, tmp_path / "dados", ("estado.json",))
+        assert (tmp_path / "dados" / "estado.json").exists()
+
+    def test_sem_nada_na_raiz_nem_cria_a_pasta(self, tmp_path):
+        from src.config import migrar_estado
+
+        migrar_estado(tmp_path, tmp_path / "dados")
+        assert not (tmp_path / "dados").exists()
+
+    def test_arquivo_nos_dois_lugares_para_a_rodada(self, tmp_path):
+        """Nao da para saber qual vale. Escolher errado e reenviar ou deixar de enviar."""
+        from src.config import migrar_estado
+
+        (tmp_path / "dados").mkdir()
+        (tmp_path / "envios.json").write_text('{"velho": 1}', encoding="utf-8")
+        (tmp_path / "dados" / "envios.json").write_text('{"novo": 1}', encoding="utf-8")
+
+        with pytest.raises(ConfiguracaoInvalida, match="raiz E em dados"):
+            migrar_estado(tmp_path, tmp_path / "dados", ("envios.json",))
+        # nenhum dos dois foi tocado
+        assert (tmp_path / "envios.json").read_text(encoding="utf-8") == '{"velho": 1}'
+        assert (tmp_path / "dados" / "envios.json").read_text(encoding="utf-8") == '{"novo": 1}'
+
+    def test_falha_ao_mover_para_a_rodada(self, tmp_path, monkeypatch):
+        from pathlib import Path
+
+        from src.config import migrar_estado
+
+        (tmp_path / "envios.json").write_text("{}", encoding="utf-8")
+
+        def recusa(self, alvo):
+            raise PermissionError("arquivo em uso")
+
+        monkeypatch.setattr(Path, "replace", recusa)
+        with pytest.raises(ConfiguracaoInvalida, match="Nao consegui mover"):
+            migrar_estado(tmp_path, tmp_path / "dados", ("envios.json",))
+        assert (tmp_path / "envios.json").exists()

@@ -8,7 +8,7 @@ Com este registro a regra vira "o mes anterior ainda nao foi gerado", entao a pr
 rodada de qualquer dia util recupera o que ficou para tras. O comportamento normal nao muda:
 no 1o dia util nada esta registrado, e tudo roda como antes.
 
-O arquivo (estado.json, na raiz) e um dicionario legivel — fabricante -> ultimo mes gerado:
+O arquivo (dados/estado.json) e um dicionario legivel — fabricante -> ultimo mes gerado:
 
     {"mensal": {"ACHE": "2026-07", "ASPEN": "2026-07"}}
 

@@ -5,7 +5,7 @@ quais arquivos montar. E so um registro do que ja aconteceu: gravar o manifesto 
 nada nem dispara nada. Quem envia e o comando de disparo — a mao, ou chamado logo depois da
 extracao pelo `src.main --enviar`, que le este mesmo arquivo pelo caminho normal.
 
-O formato (ultima-rodada.json, na raiz) e legivel de proposito, para conferir num editor:
+O formato (dados/ultima-rodada.json) e legivel de proposito, para conferir num editor:
 
     {
       "em": "2026-08-18T07:12:33",

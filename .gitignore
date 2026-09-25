@@ -9,11 +9,17 @@ gravacao*.py
 downloads/
 formatado/
 logs/
-sequencia.json
-estado.json
 envios/
-envios.json
-ultima-rodada.json
+dados/
+
+# Estado na raiz, onde ficava ate 09/2026: a primeira rodada o move para dados/
+/sequencia.json
+/estado.json
+/envios.json
+/ultima-rodada.json
+
+# Planos de sessoes do Claude Code: rascunho de trabalho, nao documentacao
+.claude/plans/
 
 # Python
 .venv/

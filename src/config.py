@@ -17,6 +17,11 @@ log = logging.getLogger(__name__)
 
 RAIZ_PROJETO = Path(__file__).resolve().parent.parent
 
+# Estado da automacao: o que ja foi gerado, o que ja foi entregue, o contador de numeracao e
+# o manifesto da ultima rodada. Ficava solto na raiz, misturado com codigo e configuracao.
+PASTA_DADOS = RAIZ_PROJETO / "dados"
+ARQUIVOS_DE_ESTADO = ("sequencia.json", "estado.json", "ultima-rodada.json", "envios.json")
+
 CANAIS = ("email", "whatsapp")
 
 # E.164: "+" seguido do pais e do numero, sem espaco nem pontuacao. O link do WhatsApp so
@@ -331,9 +336,38 @@ def _ler_obrigatorio(chave: str) -> str:
     return valor
 
 
+def migrar_estado(origem: Path, destino: Path, nomes: tuple[str, ...] = ARQUIVOS_DE_ESTADO) -> None:
+    """Move o estado da raiz (onde ficava ate 09/2026) para a pasta de dados.
+
+    Roda em toda carga de configuracao, antes de qualquer comando ler o estado — e depois
+    da primeira vez nao encontra mais nada para mover. Qualquer duvida PARA a rodada: seguir
+    lendo um envios.json vazio na pasta nova faria a automacao achar que nada foi entregue e
+    mandar tudo de novo as industrias.
+    """
+    for nome in nomes:
+        antigo, novo = origem / nome, destino / nome
+        if not antigo.exists():
+            continue
+        if novo.exists():
+            raise ConfiguracaoInvalida(
+                f"{nome} existe na raiz E em {destino.name}{os.sep}. Nao sei qual vale: confira "
+                f"os dois, fique com o certo em {destino.name}{os.sep} e apague o da raiz."
+            )
+        try:
+            destino.mkdir(parents=True, exist_ok=True)
+            antigo.replace(novo)
+        except OSError as erro:
+            raise ConfiguracaoInvalida(
+                f"Nao consegui mover {nome} para {destino.name}{os.sep}: {erro}. Feche o que "
+                "estiver com o arquivo aberto, ou mova-o a mao."
+            ) from erro
+        log.info("%s movido da raiz para %s%s.", nome, destino.name, os.sep)
+
+
 def carregar_config(headless_override: bool | None = None) -> Config:
     """Le o .env da raiz do projeto e devolve a Config validada."""
     load_dotenv(RAIZ_PROJETO / ".env")
+    migrar_estado(RAIZ_PROJETO, PASTA_DADOS)
 
     download_dir = RAIZ_PROJETO / os.getenv("DOWNLOAD_DIR", "downloads")
     # Onde fica o .xlsx formatado, pronto para enviar. Arvore separada do bruto do Geweb.
@@ -382,10 +416,10 @@ def carregar_config(headless_override: bool | None = None) -> Config:
         envios_dir=envios_dir,
         templates_dir=RAIZ_PROJETO / "templates",
         auth_state_path=RAIZ_PROJETO / ".auth" / "state.json",
-        sequencia_path=RAIZ_PROJETO / "sequencia.json",
-        estado_path=RAIZ_PROJETO / "estado.json",
-        rodada_path=RAIZ_PROJETO / "ultima-rodada.json",
-        envios_path=RAIZ_PROJETO / "envios.json",
+        sequencia_path=PASTA_DADOS / "sequencia.json",
+        estado_path=PASTA_DADOS / "estado.json",
+        rodada_path=PASTA_DADOS / "ultima-rodada.json",
+        envios_path=PASTA_DADOS / "envios.json",
         # Historico append-only: conta a cota horaria e serve de auditoria do que saiu.
         envios_historico_path=RAIZ_PROJETO / "logs" / "envios.jsonl",
         # Historico legivel das rodadas: o jsonl e a fonte, as planilhas sao projecao dele.

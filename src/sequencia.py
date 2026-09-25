@@ -3,7 +3,7 @@
 Cada arquivo baixado recebe um numero unico e crescente, que nunca se repete — nem entre
 fabricantes, nem entre periodos, nem quando o mesmo relatorio e extraido de novo.
 
-O contador vive em sequencia.json, na raiz do projeto. Se o arquivo sumir, ele se recompoe
+O contador vive em dados/sequencia.json. Se o arquivo sumir, ele se recompoe
 a partir do maior numero encontrado nas pastas de relatorios, para nunca reaproveitar um
 numero ja usado. Sao as DUAS pastas (bruto e formatado): o bruto e descartado depois de
 formatado, entao a maior parte da numeracao so existe na arvore do formatado.
