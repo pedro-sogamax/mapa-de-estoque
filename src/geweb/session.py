@@ -85,7 +85,7 @@ def fazer_login(page: Page, cfg: Config) -> None:
             + (f" O Geweb avisou: {recado}." if recado else "")
             + " Verifique GEWEB_USUARIO/GEWEB_SENHA no .env e o seletor MARCA_LOGADO. "
             "Se o Geweb pedir 2FA ou captcha, o login automatico nao e viavel — "
-            "veja a secao 'Sessao manual' do README."
+            "veja 'Sessao manual' em docs/solucao-de-problemas.md."
         ) from erro
     log.info("Login concluido")
 

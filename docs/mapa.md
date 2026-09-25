@@ -33,9 +33,9 @@ Cobre também a formatação que era feita à mão depois do download: cada rela
 `.xlsx` formatado em `formatado\`, numa pasta por mês, no mesmo layout de
 [MAPA.xlsx](referencia/MAPA.xlsx) — que é justamente um relatório deste script formatado à mão.
 
-O passo **6** fica preparado, não automático: `python -m src.disparo` monta o e-mail de cada
-laboratório (com anexo) e o aviso de WhatsApp, e o comprador confere e dispara com um clique
-cada. O desenho do envio sem intervenção humana está em [disparo.md](disparo.md).
+O passo **6** também é automático: `python -m src.disparo` envia o e-mail de cada laboratório,
+com o anexo, e a tarefa agendada encadeia o envio por e-mail ao fim da extração. O uso está em
+[envio.md](envio.md), e o desenho em [disparo.md](disparo.md).
 
 Duas observações sobre o escopo:
 
@@ -45,4 +45,4 @@ Duas observações sobre o escopo:
   binário. Abre normalmente — é como o próprio Geweb entrega. Ele continua sendo salvo como
   veio, mas quem se envia é a versão formatada, que é `.xlsx` de verdade.
 
-O passo a passo de instalação, cadastro e agendamento está no [README](../README.md).
+O passo a passo de instalação, cadastro e agendamento está no [índice da documentação](README.md).

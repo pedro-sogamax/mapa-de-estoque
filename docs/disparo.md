@@ -7,7 +7,7 @@ Desenho do passo **6** do procedimento ([mapa.md](mapa.md)): entregar o arquivo 
 > `python -m src.disparo` ([src/disparo/](../src/disparo/)) **envia de verdade**, por e-mail
 > (SMTP) e por WhatsApp (API não oficial), conforme o `canais` de cada laboratório. Pergunta
 > antes (digite `SIM`), grava o `envios.json` a cada mensagem e sai com código 3 se algum
-> envio falhar. O passo a passo está no [README](../README.md#5-enviar-às-indústrias).
+> envio falhar. O passo a passo está em [envio.md](envio.md).
 >
 > Isso implementa as §2 (camada de canais), §3 (cadastro), §4 (gatilho, idempotência, falha
 > isolada, código de saída próprio), §5 (conteúdo e anexo) e §8 (modos de teste).
@@ -125,8 +125,8 @@ src/disparo/
     codigo: 13963
     dias_semana: [segunda]
     contatos: &eurofarma          # âncora: reaproveitada pela outra entrada do grupo
-      emails: [mapa.estoque@eurofarma.com.br]
-      copia: [yuri@sogamax.com.br]
+      emails: [mapa.estoque@industria.com.br]
+      copia: [comprador@sogamax.com.br]
       whatsapp: ["+5511999999999"]
       canais: [email]             # email | whatsapp | os dois
       whatsapp_anexo: false       # true manda a planilha pelo WhatsApp tambem
@@ -217,7 +217,7 @@ política de falha isolada já usada em `extrair_todos()`. O código de saída *
 `1` de falha de extração, separa "não consegui gerar" de "gerei mas não entreguei".
 
 **Janela de horário.** Quem roda a mão escolhe a hora. Na tarefa agendada, a janela é a da
-extração — hoje 07:00 em dia útil (README §6), com os e-mails saindo logo em seguida, na
+extração — hoje 07:00 em dia útil ([agendamento.md](agendamento.md)), com os e-mails saindo logo em seguida, na
 mesma rodada.
 
 **Envio encadeado (`--enviar`).** Depois de gravar o manifesto e imprimir o resumo,

@@ -18,7 +18,7 @@ REM
 REM Para conferir o que esta agendado de verdade:
 REM   schtasks /Query /TN "Mapa de Estoque - Geweb" /V /FO LIST
 REM
-REM A tarefa e criada DESABILITADA (veja o README). Habilite so depois de homologar:
+REM A tarefa e criada DESABILITADA (veja docs/agendamento.md). Habilite so depois de homologar:
 REM   schtasks /Change /TN "Mapa de Estoque - Geweb" /ENABLE
 
 setlocal
