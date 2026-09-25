@@ -1,5 +1,5 @@
 # Fabricantes / laboratorios processados em cada rodada.
-# Gerado a partir de docs/ENVIO MAPA.xlsx (4 compradores, atualizada em 16/09/2026),
+# Gerado a partir de docs/referencia/ENVIO MAPA.xlsx (4 compradores, atualizada em 16/09/2026),
 # que traz na mesma tabela os dias de envio e a coluna E-MAIL. As planilhas anteriores
 # (FABRICANTES ENVIO MAPA.xlsx e Fabricantes atualizado.xlsx) ficaram obsoletas.
 #
@@ -63,7 +63,7 @@
 
 fabricantes:
   # =====================================================================================
-  # CONTATOS REAIS DAS INDUSTRIAS (26/08/2026) — de docs/Fabricantes atualizado.xlsx.
+  # CONTATOS REAIS DAS INDUSTRIAS (26/08/2026) — de docs/referencia/Fabricantes atualizado.xlsx.
   #
   # Ate aqui este arquivo so tinha enderecos internos, e isso era uma segunda protecao:
   # nao havia como um mapa chegar a um fornecedor, porque nenhum fornecedor existia no
@@ -76,7 +76,7 @@ fabricantes:
   # Esvazia-la e a acao que libera o envio real. Antes disso, confira a leva com
   # `python -m src.disparo --dry-run`, que mostra o destino de cada mensagem.
   # =====================================================================================
-  # AGENDA DE 15/09/2026 — de docs/ENVIO MAPA.xlsx: TODOS com mensal e semanal de segunda;
+  # AGENDA DE 15/09/2026 — de docs/referencia/ENVIO MAPA.xlsx: TODOS com mensal e semanal de segunda;
   # EUROFARMA_RX e MARJAN tambem na quarta. Entrou a CELLERA (dois codigos), saiu a ASPEN.
   # =====================================================================================
   # --- ATENCAO: na planilha os codigos das linhas 2 e 3 estao trocados entre si. -------
@@ -104,7 +104,7 @@ fabricantes:
     contatos: {emails: [lindomar.amaral@biosintetica.com.br], copia: [pedro@sogamax.com.br, yuritoso@sogamax.com.br], canais: [email]}
   # ------------------------------------------------------------------------------------
 
-  # DESATIVADO em 15/09/2026: fora da docs/ENVIO MAPA.xlsx. Mantido no arquivo, como a
+  # DESATIVADO em 15/09/2026: fora da docs/referencia/ENVIO MAPA.xlsx. Mantido no arquivo, como a
   # SANOFI_MEDLEY — reativar e trocar por `true`. O registro em estado.json nao foi mexido.
   - nome: ASPEN
     codigos:
@@ -254,7 +254,7 @@ fabricantes:
   # DESATIVADO em 27/08/2026: parceria encerrada (Pedro). Mantido no arquivo de proposito —
   # `ativo: false` desliga a extracao e o envio, e reativar e trocar por `true`. Os relatorios
   # ja gerados continuam em disco, e o registro em estado.json nao foi mexido.
-  # Tambem nao consta da docs/ENVIO MAPA.xlsx de 15/09/2026.
+  # Tambem nao consta da docs/referencia/ENVIO MAPA.xlsx de 15/09/2026.
   - nome: SANOFI_MEDLEY
     codigo: 21570           # SANOFI (RX - SUZANO - SP )
     ativo: false
@@ -283,7 +283,7 @@ fabricantes:
     contatos: {emails: [Antonio.Barbara@viatris.com], copia: [pedro@sogamax.com.br, yuritoso@sogamax.com.br], canais: [email]}
 
   # =====================================================================================
-  # CARTEIRA DE MIKELY TAMY (16/09/2026) — de docs/ENVIO MAPA.xlsx, coluna COMPRADOR.
+  # CARTEIRA DE MIKELY TAMY (16/09/2026) — de docs/referencia/ENVIO MAPA.xlsx, coluna COMPRADOR.
   # Todos com mensal e semanal de segunda. A PRINCIPIA (44310) saiu a pedido dela.
   # =====================================================================================
 

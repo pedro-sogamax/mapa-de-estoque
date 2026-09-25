@@ -2,7 +2,7 @@
 
 Cada fabricante recebe o mapa MENSAL (mes anterior fechado, gerado no 1o dia util do mes —
 que pula fim de semana E feriado nacional). Alguns recebem TAMBEM um envio semanal, nos
-dias marcados na planilha "docs/ENVIO MAPA.xlsx" — esse envio cobre o mes corrente
+dias marcados na planilha "docs/referencia/ENVIO MAPA.xlsx" — esse envio cobre o mes corrente
 ate ontem (acumulado).
 """
 

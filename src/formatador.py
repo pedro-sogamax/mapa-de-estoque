@@ -6,7 +6,7 @@ Excel, so que sem formatacao nenhuma e com os numeros gravados como texto em pt-
 industria.
 
 Este modulo faz esse trabalho. O layout de saida foi medido celula a celula em
-docs/MAPA.xlsx, que e justamente um relatorio deste script formatado a mao (a aba dele se
+docs/referencia/MAPA.xlsx, que e justamente um relatorio deste script formatado a mao (a aba dele se
 chama "0017_HERBAMED_2026-07").
 
 Como utilitario de conferencia, sem abrir o Geweb:

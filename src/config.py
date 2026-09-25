@@ -169,9 +169,9 @@ class Fabricante:
     cada centro de distribuicao). Como o campo aceita multipla escolha, todos entram no
     mesmo relatorio. Rode `python -m src.descobrir --fabricantes` para ver a lista completa.
 
-    `mensal` e `dias_semana` vem da planilha "docs/ENVIO MAPA.xlsx": a coluna MENSAL e as
-    colunas de dia da semana, marcadas com X. Um fabricante pode, portanto, gerar DOIS
-    relatorios diferentes — o mensal e o semanal.
+    `mensal` e `dias_semana` vem da planilha "docs/referencia/ENVIO MAPA.xlsx": a coluna
+    MENSAL e as colunas de dia da semana, marcadas com X. Um fabricante pode, portanto, gerar
+    DOIS relatorios diferentes — o mensal e o semanal.
     """
 
     nome: str

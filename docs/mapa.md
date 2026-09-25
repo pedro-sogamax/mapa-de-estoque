@@ -9,7 +9,7 @@ fornecedores parceiros.
 
 ## O procedimento manual
 
-Extraído de [MAPA DE ESTOQUE.docx](MAPA%20DE%20ESTOQUE.docx). É o que o comprador faz hoje,
+Extraído de [MAPA DE ESTOQUE.docx](referencia/MAPA%20DE%20ESTOQUE.docx). É o que o comprador faz hoje,
 fabricante por fabricante:
 
 1. No Geweb, seguir **RELATÓRIOS → MOVIMENTAÇÃO → COMPRAS/VENDAS POR PRODUTO**.
@@ -20,7 +20,7 @@ fabricante por fabricante:
 6. Enviar o arquivo por e-mail à indústria.
 
 O mapa é enviado em periodicidades diferentes conforme o combinado com cada indústria. A
-planilha do comprador ([ENVIO MAPA.xlsx](ENVIO%20MAPA.xlsx)) é quem
+planilha do comprador ([ENVIO MAPA.xlsx](referencia/ENVIO%20MAPA.xlsx)) é quem
 manda nisso: uma coluna MENSAL e uma coluna por dia da semana.
 
 ## O que a automação cobre
@@ -31,7 +31,7 @@ próprios, sem sobrescrever nada.
 
 Cobre também a formatação que era feita à mão depois do download: cada relatório é gravado como
 `.xlsx` formatado em `formatado\`, numa pasta por mês, no mesmo layout de
-[MAPA.xlsx](MAPA.xlsx) — que é justamente um relatório deste script formatado à mão.
+[MAPA.xlsx](referencia/MAPA.xlsx) — que é justamente um relatório deste script formatado à mão.
 
 O passo **6** fica preparado, não automático: `python -m src.disparo` monta o e-mail de cada
 laboratório (com anexo) e o aviso de WhatsApp, e o comprador confere e dispara com um clique

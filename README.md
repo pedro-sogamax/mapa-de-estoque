@@ -45,7 +45,8 @@ Quarenta e seis vezes por semana, entre quatro compradores.
 | saber o que deu certo e errado num dia | [O histórico, em Excel](#o-histórico-em-excel) |
 
 O desenho completo do envio está em [docs/disparo.md](docs/disparo.md), e o passo manual que
-deu origem a tudo isso, em [docs/mapa.md](docs/mapa.md).
+deu origem a tudo isso, em [docs/mapa.md](docs/mapa.md). O índice da documentação, com as
+propostas em aberto, está em [docs/README.md](docs/README.md).
 
 ## Quatro coisas que evitam susto
 
@@ -224,7 +225,7 @@ Para achar os códigos, a lista completa dos 1150 fornecedores está em
 
 ### Agenda de envio: mensal + dias da semana
 
-O cadastro vem de [docs/ENVIO MAPA.xlsx](docs/ENVIO%20MAPA.xlsx), a planilha do comprador,
+O cadastro vem de [docs/referencia/ENVIO MAPA.xlsx](docs/referencia/ENVIO%20MAPA.xlsx), a planilha do comprador,
 que define **dois envios independentes**. Um fabricante pode receber os dois:
 
 | Campo | Quando dispara | Período que o relatório cobre |
@@ -488,7 +489,7 @@ gravados como texto em pt-BR (`1.269,92`). Era isso que alguém abria no Excel e
 mão, um por um, antes de mandar para a indústria.
 
 [src/formatador.py](src/formatador.py) faz esse trabalho ao fim de cada extração. O modelo é o
-[docs/MAPA.xlsx](docs/MAPA.xlsx) — um relatório deste script formatado à mão, cujo layout foi
+[docs/referencia/MAPA.xlsx](docs/referencia/MAPA.xlsx) — um relatório deste script formatado à mão, cujo layout foi
 medido célula a célula e reproduzido:
 
 | | |
@@ -718,13 +719,13 @@ O cadastro de contatos tem uma linha do tempo, e ela explica por que o arquivo e
 está hoje.
 
 **26/08/2026** — a partir da coluna `E-MAIL` de
-[docs/Fabricantes atualizado.xlsx](docs/Fabricantes%20atualizado.xlsx), os 24 laboratórios de
+[docs/referencia/Fabricantes atualizado.xlsx](docs/referencia/Fabricantes%20atualizado.xlsx), os 24 laboratórios de
 então ganharam e-mail, todos com `copia: [pedro@sogamax.com.br, yuritoso@sogamax.com.br]` e
 `canais: [email]`. Telefone não existia na planilha, e por isso o WhatsApp ficou de fora.
 
 **27/08/2026** — a SANOFI_MEDLEY foi desligada com `ativo: false`, por fim da parceria.
 
-**15/09/2026** — [docs/ENVIO MAPA.xlsx](docs/ENVIO%20MAPA.xlsx) passou a ser a planilha de
+**15/09/2026** — [docs/referencia/ENVIO MAPA.xlsx](docs/referencia/ENVIO%20MAPA.xlsx) passou a ser a planilha de
 referência (dias de envio e e-mail na mesma tabela):
 
 - todos os laboratórios passam a receber também o **semanal de segunda**; EUROFARMA_RX e
