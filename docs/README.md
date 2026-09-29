@@ -27,7 +27,7 @@ Ideias ainda **não implementadas**, guardadas para decisão.
 
 | Documento | Situação |
 |---|---|
-| [propostas/revisao-semanal.md](propostas/revisao-semanal.md) — com [fluxograma](propostas/revisao-semanal-fluxograma.html) | Relatório semanal ao revisor com recibo de leitura automático. Aguarda aprovação da diretoria e respostas da TI |
+| [propostas/revisao-semanal.md](propostas/revisao-semanal.md) — com [fluxograma](propostas/revisao-semanal-fluxograma.html) | Relatório semanal à revisora, com a leitura conferida pela marcação de lida na caixa dela (IMAP). Mecanismo testado; aguarda aprovação da diretoria |
 
 ## Referência
 

@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Recibo do Relatório Semanal</title>
+<title>Leitura do Relatório Semanal</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
@@ -110,14 +110,14 @@
 <main>
   <header>
     <p class="eyebrow">Mapa de Estoque · proposta</p>
-    <h1>Recibo do relatório semanal</h1>
-    <p class="lead">Toda segunda, assim que a rodada termina de extrair e enviar os 46 semanais, o relatório vai por e-mail para o revisor. Ele não sai num horário fixo: sai depois do último envio, para já incluir o resultado da maior leva da semana.</p>
-    <p class="lead">A semana do relatório vai de terça a segunda. Ao abrir, o e-mail devolve um recibo sozinho, e a automação anota na planilha quem leu e quando. Se o recibo não chegar em 3 dias, o diretor é avisado.</p>
+    <h1>Leitura do relatório semanal</h1>
+    <p class="lead">Toda segunda, assim que a rodada termina de extrair e enviar os 45 semanais, o relatório vai por e-mail para a revisora. Ele não sai num horário fixo: sai depois do último envio, para já incluir o resultado da maior leva da semana.</p>
+    <p class="lead">A semana do relatório vai de terça a segunda. Quando a revisora abre o e-mail, o servidor marca a mensagem como lida, e a automação confere essa marca na caixa dela e anota na planilha. Se o relatório não for lido em 3 dias úteis (prazo configurável), a gerente é avisada.</p>
   </header>
 
   <figure>
     <div class="diagrama">
-      <svg viewBox="0 0 1400 570" role="img" aria-label="Fluxo: a automação envia o relatório semanal com pedido de recibo; o revisor abre o e-mail; o recibo volta para a caixa confirmacao@; a rodada diária lê a caixa; se o recibo chegou, a aba Revisões registra quem leu; se não chegou em 3 dias, o diretor recebe um alerta.">
+      <svg viewBox="0 0 1400 570" role="img" aria-label="Fluxo: a automação envia o relatório semanal à revisora; a revisora abre o e-mail; o servidor marca a mensagem como lida na caixa precificacao@; a rodada diária confere a caixa, só para leitura; se a mensagem está marcada como lida, a aba Revisões registra Lido; se não foi lida em 3 dias úteis, registra Sem leitura e a gerente recebe um alerta.">
         <defs>
           <marker id="ponta" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
             <path d="M0,0 L10,5 L0,10 z" fill="currentColor"/>
@@ -132,11 +132,11 @@
 
         <text class="t-raia" x="20" y="90">Automação</text>
         <text class="t-raia-sub" x="20" y="108">tarefa agendada</text>
-        <text class="t-raia" x="20" y="245">Revisor</text>
+        <text class="t-raia" x="20" y="245">Revisora</text>
         <text class="t-raia" x="20" y="356">Caixa</text>
-        <text class="t-raia-sub" x="20" y="374">confirmacao@</text>
+        <text class="t-raia-sub" x="20" y="374">precificacao@</text>
         <text class="t-raia" x="20" y="490">Planilha</text>
-        <text class="t-raia-sub" x="20" y="508">e diretor</text>
+        <text class="t-raia-sub" x="20" y="508">e gerente</text>
 
         <!-- 1. monta -->
         <rect class="no" x="170" y="63" width="150" height="64" rx="6"/>
@@ -149,41 +149,42 @@
         <!-- 2. envia -->
         <rect class="no" x="350" y="63" width="150" height="64" rx="6"/>
         <text class="t-forte" x="425" y="83" text-anchor="middle">Envia o e-mail</text>
-        <text class="t" x="425" y="100" text-anchor="middle">ao revisor, com</text>
-        <text class="t" x="425" y="116" text-anchor="middle">pedido de recibo</text>
+        <text class="t" x="425" y="100" text-anchor="middle">à revisora, com</text>
+        <text class="t" x="425" y="116" text-anchor="middle">a planilha anexa</text>
 
         <path class="seta" d="M425 127 V240 H528" marker-end="url(#ponta)"/>
         <text class="t-rotulo" x="433" y="190">e-mail semanal</text>
 
-        <!-- 3. revisor abre -->
+        <!-- 3. revisora abre -->
         <rect class="no-humano" x="530" y="208" width="150" height="64" rx="6"/>
         <text class="t-forte" x="605" y="236" text-anchor="middle">Abre o e-mail</text>
         <text class="t-acento" x="605" y="254" text-anchor="middle">única ação humana</text>
 
         <path class="seta" d="M605 272 V360 H708" marker-end="url(#ponta)"/>
-        <text class="t-rotulo" x="613" y="320">devolvido sozinho</text>
+        <text class="t-rotulo" x="613" y="320">Outlook, celular ou webmail</text>
 
-        <!-- 4. recibo chega -->
+        <!-- 4. servidor marca -->
         <rect class="no" x="710" y="328" width="150" height="64" rx="6"/>
-        <text class="t-forte" x="785" y="348" text-anchor="middle">Recibo chega</text>
-        <text class="t" x="785" y="365" text-anchor="middle">com nome, data</text>
-        <text class="t" x="785" y="381" text-anchor="middle">e hora da leitura</text>
+        <text class="t-forte" x="785" y="348" text-anchor="middle">Servidor marca</text>
+        <text class="t-forte" x="785" y="365" text-anchor="middle">como lida</text>
+        <text class="t" x="785" y="381" text-anchor="middle">sozinho</text>
 
         <path class="seta" d="M860 360 H945 V129" marker-end="url(#ponta)"/>
-        <text class="t-rotulo" x="953" y="250">lido por IMAP</text>
+        <text class="t-rotulo" x="953" y="240">IMAP,</text>
+        <text class="t-rotulo" x="953" y="256">só leitura</text>
 
         <!-- 5. rodada diaria -->
         <rect class="no" x="870" y="63" width="150" height="64" rx="6"/>
         <text class="t-forte" x="945" y="83" text-anchor="middle">Rodada diária</text>
         <text class="t" x="945" y="100" text-anchor="middle">confere a caixa</text>
-        <text class="t" x="945" y="116" text-anchor="middle">de recibos</text>
+        <text class="t" x="945" y="116" text-anchor="middle">da revisora</text>
 
         <path class="seta" d="M1020 95 H1041" marker-end="url(#ponta)"/>
 
         <!-- decisao 1 -->
         <polygon class="decisao" points="1043,95 1105,45 1167,95 1105,145"/>
-        <text class="t-forte" x="1105" y="92" text-anchor="middle">Recibo</text>
-        <text class="t-forte" x="1105" y="108" text-anchor="middle">chegou?</text>
+        <text class="t-forte" x="1105" y="92" text-anchor="middle">Está</text>
+        <text class="t-forte" x="1105" y="108" text-anchor="middle">lida?</text>
 
         <path class="seta" d="M1167 95 H1226" marker-end="url(#ponta)"/>
         <text class="t-rotulo" x="1196" y="87" text-anchor="middle">não</text>
@@ -191,7 +192,7 @@
         <!-- decisao 2 -->
         <polygon class="decisao" points="1228,95 1290,45 1352,95 1290,145"/>
         <text class="t-forte" x="1290" y="92" text-anchor="middle">Passaram</text>
-        <text class="t-forte" x="1290" y="108" text-anchor="middle">3 dias?</text>
+        <text class="t-forte" x="1290" y="108" text-anchor="middle">3 dias úteis?</text>
 
         <!-- volta -->
         <path class="seta" d="M1290 45 V24 H945 V61" marker-end="url(#ponta)"/>
@@ -203,7 +204,7 @@
         <rect class="no-ok" x="1030" y="460" width="150" height="70" rx="6"/>
         <text class="t" x="1105" y="480" text-anchor="middle">Aba Revisões</text>
         <text class="t-ok" x="1105" y="498" text-anchor="middle">Lido</text>
-        <text class="t" x="1105" y="516" text-anchor="middle">por quem e quando</text>
+        <text class="t" x="1105" y="516" text-anchor="middle">até a conferência</text>
 
         <!-- sim -> alerta -->
         <path class="seta" d="M1290 145 V458" marker-end="url(#ponta)"/>
@@ -211,35 +212,35 @@
         <rect class="no-warn" x="1210" y="460" width="160" height="70" rx="6"/>
         <text class="t" x="1290" y="480" text-anchor="middle">Aba Revisões</text>
         <text class="t-warn" x="1290" y="498" text-anchor="middle">Sem leitura</text>
-        <text class="t" x="1290" y="516" text-anchor="middle">+ alerta ao diretor</text>
+        <text class="t" x="1290" y="516" text-anchor="middle">+ alerta à gerente</text>
       </svg>
     </div>
-    <figcaption>O revisor só abre o e-mail. Todo o resto é automático: o recibo volta para a caixa que já envia os mapas, a rodada diária o encontra e registra na planilha. Sem recibo em 3 dias, a semana fica marcada como "Sem leitura" e o diretor recebe um alerta.</figcaption>
+    <figcaption>A revisora só abre o e-mail. Todo o resto é automático: o servidor da Locaweb marca a mensagem como lida, e a rodada diária confere essa marca na caixa dela, sem nunca marcar nada por conta própria. Se o relatório não for lido em 3 dias úteis, a semana fica como "Sem leitura" e a gerente recebe um alerta.</figcaption>
   </figure>
 
   <section>
-    <h2>O que o diretor vê na planilha</h2>
+    <h2>O que a diretoria vê na planilha</h2>
     <div class="tabela">
       <table>
         <thead>
-          <tr><th>SEMANA</th><th>ENVIADO EM</th><th>LIDO POR</th><th>LIDO EM</th><th>SITUAÇÃO</th></tr>
+          <tr><th>SEMANA</th><th>ENVIADO EM</th><th>LIDO ATÉ</th><th>SITUAÇÃO</th></tr>
         </thead>
         <tbody>
-          <tr><td>09/09 a 15/09</td><td>15/09 07:09</td><td>revisor@sogamax.com.br</td><td>15/09 09:14</td><td><span class="pill pill-ok">Lido</span></td></tr>
-          <tr><td>16/09 a 22/09</td><td>22/09 07:08</td><td>revisor@sogamax.com.br</td><td>23/09 16:40</td><td><span class="pill pill-ok">Lido</span></td></tr>
-          <tr><td>23/09 a 29/09</td><td>29/09 07:11</td><td>—</td><td>—</td><td><span class="pill pill-warn">Sem leitura</span></td></tr>
+          <tr><td>09/09 a 15/09</td><td>15/09 07:09</td><td>15/09 10:00</td><td><span class="pill pill-ok">Lido</span></td></tr>
+          <tr><td>16/09 a 22/09</td><td>22/09 07:08</td><td>23/09 17:00</td><td><span class="pill pill-ok">Lido</span></td></tr>
+          <tr><td>23/09 a 29/09</td><td>29/09 07:11</td><td>—</td><td><span class="pill pill-warn">Sem leitura</span></td></tr>
         </tbody>
       </table>
     </div>
-    <p class="nota">Linhas de exemplo. A aba Revisões fica na mesma planilha de histórico que já vai para o ownCloud.</p>
+    <p class="nota">Linhas de exemplo. "Lido até" é a hora da conferência que encontrou a mensagem lida: o servidor guarda que ela foi lida, não quando. A aba Revisões fica na mesma planilha de histórico que já vai para o ownCloud.</p>
   </section>
 
   <section class="dois">
     <div>
       <h3>O que prova</h3>
       <ul>
-        <li>Que o e-mail com o relatório da semana foi aberto.</li>
-        <li>Por quem e em que data e hora.</li>
+        <li>Que o e-mail com o relatório da semana foi aberto na caixa da revisora, que só ela usa.</li>
+        <li>Até quando isso aconteceu.</li>
         <li>Quais semanas ficaram sem leitura.</li>
       </ul>
     </div>
@@ -248,14 +249,14 @@
       <ul>
         <li>Que o conteúdo foi lido com atenção. Nada prova isso sem pedir uma ação da pessoa.</li>
         <li>Que a planilha anexada foi aberta. O que se mede é a abertura do e-mail, por isso o resumo vai no corpo dele.</li>
+        <li>Que foi aberto de fato, se a mensagem for marcada como lida sem abrir.</li>
       </ul>
     </div>
     <div>
-      <h3>Depende de</h3>
+      <h3>Testado</h3>
       <ul>
-        <li>A TI deixar o recibo automático no e-mail do revisor, sem perguntar se ele quer enviar.</li>
-        <li>Acesso IMAP à caixa <code>confirmacao@</code>, que hoje só envia.</li>
-        <li>O nome e o e-mail do revisor.</li>
+        <li>Em 29/09/2026, um e-mail de teste chegou à <code>precificacao@</code> como não lido, continuou assim e passou a lido quando a Nayra o abriu.</li>
+        <li>A automação entra na caixa com a senha dela, guardada no <code>.env</code>, e só lê.</li>
       </ul>
     </div>
   </section>
