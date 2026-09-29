@@ -3,6 +3,15 @@
 Mudanças relevantes para quem opera ou mantém o Mapa de Estoque, da mais recente para a mais
 antiga. O detalhe de cada uma está no histórico do git.
 
+## 2026-09-29
+
+- O MEDLEY_GENERICOS (códigos 112481 e 112489) passou do semanal de segunda para o de quarta.
+  A segunda cai para 45 semanais, e o pior caso (mensal atrasado recuperado numa segunda)
+  para 88 mensagens.
+- Proposta de revisão semanal: a leitura do relatório passa a ser conferida pela marcação de
+  lida na caixa da revisora, por IMAP, no lugar do recibo de leitura. Mecanismo testado;
+  ainda não implementado.
+
 ## 2026-09-25
 
 - Documentação reorganizada: o README virou uma visão geral, e os guias foram para `docs/`
