@@ -49,16 +49,23 @@ O e-mail devolve.
    leitura conta a partir daí.
 2. **A revisora abre o e-mail** no Outlook, no celular ou no webmail — tanto faz. Ao abrir,
    o servidor da Locaweb marca a mensagem como lida (`\Seen`), porque a caixa dela é IMAP.
-3. **A rodada diária entra na caixa da revisora por IMAP**, só para ler, e procura o
-   relatório da semana pelo Message-ID que o envio devolveu.
+3. **A automação confere a caixa da revisora de hora em hora**, das 8h às 18h nos dias
+   úteis, por IMAP e só para ler, e procura o relatório da semana pelo Message-ID que o
+   envio devolveu.
    - Marcado como lido → a aba **Revisões** registra *Lido*.
    - Não lido e já passou o **prazo** → a aba registra *Sem leitura* e a gerente recebe um
      alerta.
-   - Não lido e o prazo ainda não passou → confere de novo na próxima rodada.
+   - Não lido e o prazo ainda não passou → confere de novo na hora seguinte.
+   - **Lido depois do prazo** → a conferência continua depois do alerta, até sair o relatório
+     da semana seguinte. Se a revisora ler nesse meio-tempo, a semana passa de *Sem leitura*
+     para *Lido após o prazo*, com a data. Não sai outro e-mail: a gerente vê na planilha.
 
    O prazo é contado em **dias úteis** e fica no `.env` (`REVISAO_PRAZO_DIAS`, padrão **3**):
    relatório de segunda não lido gera alerta na quinta, e um feriado no meio empurra o
    alerta um dia.
+
+   Quando não há relatório pendente — a maior parte da semana —, a conferência sai sem
+   conectar a nada.
 
 A **semana do relatório vai de terça a segunda**, fechando com a rodada que o envia.
 
@@ -75,13 +82,15 @@ Uma aba nova, **Revisões**, na mesma planilha de histórico que já chega pelo 
 | SEMANA | ENVIADO EM | LIDO ATÉ | SITUAÇÃO |
 |---|---|---|---|
 | 09/09 a 15/09 | 15/09 07:09 | 15/09 10:00 | Lido |
+| 16/09 a 22/09 | 22/09 07:08 | 26/09 11:00 | Lido após o prazo |
 | 23/09 a 29/09 | 29/09 07:11 | — | Sem leitura |
 
 *(linhas de exemplo)*
 
 **"Lido até", não "lido em".** O IMAP guarda *que* a mensagem foi lida, não *quando*. A data
-registrada é a da conferência que encontrou a marcação — a leitura aconteceu antes dela. A
-precisão depende de quantas vezes a caixa é conferida (seção 6).
+registrada é a da conferência que encontrou a marcação — a leitura aconteceu antes dela.
+Com a conferência de hora em hora, a diferença é de no máximo uma hora; uma leitura fora do
+horário comercial aparece na primeira conferência seguinte (às 8h do próximo dia útil).
 
 Como as outras abas, ela é projeção, refeita a cada rodada a partir de `dados/revisoes.json`:
 por semana, o Message-ID do relatório, quando saiu, quando a leitura foi percebida e se o
@@ -121,7 +130,10 @@ abriu. Nada na caixa marca mensagens como lidas sozinho.
 |---|---|
 | Envio do relatório | [src/main.py](../../src/main.py), no fim da rodada quando `weekday() == 0`: depois de `_disparar_email`, e também nos `return` de falha do Geweb, para o relatório sair mesmo com a rodada quebrada. `CanalEmail` com `Mensagem.corpo_html` e anexo; o Message-ID vem de `Envio.identificadores` |
 | Planilha da semana | [src/historico.py](../../src/historico.py): os eventos de `historico.jsonl` filtrados de terça a segunda, montados com o mesmo `_aba` das planilhas mensais |
-| Conferência de leitura | módulo novo, chamado em toda rodada antes do `return` de dia sem tarefa do `main`; fica de fora em `--planejar` e nas rodadas manuais. `EXAMINE` em cada pasta, `SEARCH HEADER Message-ID`, `FETCH (FLAGS)` |
+| Conferência de leitura | módulo novo, com comando próprio (`python -m src.revisao`), chamado pela tarefa de hora em hora e também em toda rodada, antes do `return` de dia sem tarefa do `main`; fica de fora em `--planejar` e nas rodadas manuais. `EXAMINE` em cada pasta, `SEARCH HEADER Message-ID`, `FETCH (FLAGS)` |
+| Tarefa de hora em hora | segunda tarefa agendada no Windows, das 8h às 18h nos dias úteis, só com a conferência — em [docs/agendamento.md](../agendamento.md) e no roteiro de migração, que passa a ter duas tarefas para recriar |
+| Trava | a conferência e a rodada gravam no mesmo `dados/revisoes.json` e na mesma planilha. Se a rodada estiver rodando, a conferência pula aquela hora |
+| Planilha e log | a conferência só regrava a planilha e só escreve no log quando algo muda (leitura percebida, prazo vencido) — no máximo uma ou duas vezes por semana. Regravar toda hora faria o ownCloud sincronizar o arquivo toda hora, e falharia com a planilha aberta no Excel |
 | Aba Revisões | `gerar_planilhas` em [src/historico.py](../../src/historico.py) |
 | Alerta de prazo | [src/alerta.py](../../src/alerta.py), que já envia sem passar pela cota das indústrias, mas com destinatário próprio |
 | Falha da conferência | senha trocada ou IMAP fora → alerta técnico pelo `ALERTA_PARA`, não *Sem leitura*: a leitura não pôde ser conferida, o que é diferente de não ter acontecido |
@@ -136,9 +148,6 @@ atrasado, 88 + 2 = 90 de 100 — cabe, com pouca folga.
 
 ## 6. Em aberto
 
-- [ ] **Com que frequência conferir a caixa.** Só na rodada diária, "lido até" pode ficar
-      até um dia depois da leitura. Uma tarefa agendada leve, de hora em hora no horário
-      comercial, que só faz a conferência, deixa a data com precisão de uma hora.
 - [ ] Aprovação da diretoria.
 
 ## 7. Decidido em 29/09/2026
@@ -158,6 +167,12 @@ atrasado, 88 + 2 = 90 de 100 — cabe, com pouca folga.
   da revisora.
 - **Relatório:** totais e pendências no corpo, planilha da semana em anexo.
 - **Prazo:** dias úteis, configurável (padrão 3).
+- **Frequência da conferência:** de hora em hora, das 8h às 18h nos dias úteis, além da
+  rodada diária. Custo: nenhum em dinheiro; ~1 s por execução sem relatório pendente, 2 a
+  3 s com; de 2 a 5 conexões à caixa numa semana típica, cerca de 35 se ela não ler até o
+  alerta — menos do que o próprio Outlook dela consulta o servidor.
+- **Leitura depois do prazo:** a conferência continua até o relatório seguinte, e a semana
+  passa a *Lido após o prazo*, com a data, sem novo e-mail.
 - **Rodada de segunda quebrada:** o relatório sai mesmo assim.
 
 Descartados:

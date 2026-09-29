@@ -112,12 +112,12 @@
     <p class="eyebrow">Mapa de Estoque · proposta</p>
     <h1>Leitura do relatório semanal</h1>
     <p class="lead">Toda segunda, assim que a rodada termina de extrair e enviar os 45 semanais, o relatório vai por e-mail para a revisora. Ele não sai num horário fixo: sai depois do último envio, para já incluir o resultado da maior leva da semana.</p>
-    <p class="lead">A semana do relatório vai de terça a segunda. Quando a revisora abre o e-mail, o servidor marca a mensagem como lida, e a automação confere essa marca na caixa dela e anota na planilha. Se o relatório não for lido em 3 dias úteis (prazo configurável), a gerente é avisada.</p>
+    <p class="lead">A semana do relatório vai de terça a segunda. Quando a revisora abre o e-mail, o servidor marca a mensagem como lida, e a automação confere essa marca na caixa dela, de hora em hora no horário comercial, e anota na planilha. Se o relatório não for lido em 3 dias úteis (prazo configurável), a gerente é avisada.</p>
   </header>
 
   <figure>
     <div class="diagrama">
-      <svg viewBox="0 0 1400 570" role="img" aria-label="Fluxo: a automação envia o relatório semanal à revisora; a revisora abre o e-mail; o servidor marca a mensagem como lida na caixa precificacao@; a rodada diária confere a caixa, só para leitura; se a mensagem está marcada como lida, a aba Revisões registra Lido; se não foi lida em 3 dias úteis, registra Sem leitura e a gerente recebe um alerta.">
+      <svg viewBox="0 0 1400 570" role="img" aria-label="Fluxo: a automação envia o relatório semanal à revisora; a revisora abre o e-mail; o servidor marca a mensagem como lida na caixa precificacao@; a automação confere a caixa de hora em hora, só para leitura; se a mensagem está marcada como lida, a aba Revisões registra Lido; se não foi lida em 3 dias úteis, registra Sem leitura e a gerente recebe um alerta.">
         <defs>
           <marker id="ponta" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
             <path d="M0,0 L10,5 L0,10 z" fill="currentColor"/>
@@ -175,7 +175,7 @@
 
         <!-- 5. rodada diaria -->
         <rect class="no" x="870" y="63" width="150" height="64" rx="6"/>
-        <text class="t-forte" x="945" y="83" text-anchor="middle">Rodada diária</text>
+        <text class="t-forte" x="945" y="83" text-anchor="middle">De hora em hora</text>
         <text class="t" x="945" y="100" text-anchor="middle">confere a caixa</text>
         <text class="t" x="945" y="116" text-anchor="middle">da revisora</text>
 
@@ -196,7 +196,7 @@
 
         <!-- volta -->
         <path class="seta" d="M1290 45 V24 H945 V61" marker-end="url(#ponta)"/>
-        <text class="t-rotulo" x="1117" y="17" text-anchor="middle">não: confere de novo na próxima rodada</text>
+        <text class="t-rotulo" x="1117" y="17" text-anchor="middle">não: confere de novo na hora seguinte</text>
 
         <!-- sim -> lido -->
         <path class="seta" d="M1105 145 V458" marker-end="url(#ponta)"/>
@@ -215,7 +215,7 @@
         <text class="t" x="1290" y="516" text-anchor="middle">+ alerta à gerente</text>
       </svg>
     </div>
-    <figcaption>A revisora só abre o e-mail. Todo o resto é automático: o servidor da Locaweb marca a mensagem como lida, e a rodada diária confere essa marca na caixa dela, sem nunca marcar nada por conta própria. Se o relatório não for lido em 3 dias úteis, a semana fica como "Sem leitura" e a gerente recebe um alerta.</figcaption>
+    <figcaption>A revisora só abre o e-mail. Todo o resto é automático: o servidor da Locaweb marca a mensagem como lida, e a automação confere essa marca na caixa dela de hora em hora, das 8h às 18h, sem nunca marcar nada por conta própria. Se o relatório não for lido em 3 dias úteis, a semana fica como "Sem leitura" e a gerente recebe um alerta. A conferência continua até o relatório seguinte: se ela ler depois, a semana passa a "Lido após o prazo".</figcaption>
   </figure>
 
   <section>
@@ -227,12 +227,12 @@
         </thead>
         <tbody>
           <tr><td>09/09 a 15/09</td><td>15/09 07:09</td><td>15/09 10:00</td><td><span class="pill pill-ok">Lido</span></td></tr>
-          <tr><td>16/09 a 22/09</td><td>22/09 07:08</td><td>23/09 17:00</td><td><span class="pill pill-ok">Lido</span></td></tr>
+          <tr><td>16/09 a 22/09</td><td>22/09 07:08</td><td>26/09 11:00</td><td><span class="pill pill-warn">Lido após o prazo</span></td></tr>
           <tr><td>23/09 a 29/09</td><td>29/09 07:11</td><td>—</td><td><span class="pill pill-warn">Sem leitura</span></td></tr>
         </tbody>
       </table>
     </div>
-    <p class="nota">Linhas de exemplo. "Lido até" é a hora da conferência que encontrou a mensagem lida: o servidor guarda que ela foi lida, não quando. A aba Revisões fica na mesma planilha de histórico que já vai para o ownCloud.</p>
+    <p class="nota">Linhas de exemplo. "Lido até" é a hora da conferência que encontrou a mensagem lida: o servidor guarda que ela foi lida, não quando. Com a conferência de hora em hora, a diferença é de no máximo uma hora. A aba Revisões fica na mesma planilha de histórico que já vai para o ownCloud.</p>
   </section>
 
   <section class="dois">
