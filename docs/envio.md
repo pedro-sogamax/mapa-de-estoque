@@ -127,7 +127,7 @@ porque repetir só gasta a reputação do remetente.
 **Credencial recusada é caso à parte:** uma tentativa e a leva inteira para, com código 3.
 Repetir login com senha errada é o caminho mais curto para o provedor bloquear a conta.
 
-> ⚠️ **A margem da cota é pequena.** A segunda-feira envia uma mensagem por laboratório ativo,
+> ⚠️ **A margem da cota é pequena.** A segunda-feira envia uma mensagem por laboratório ativo (45 de 46; o MEDLEY_GENERICOS é de quarta),
 > e uma segunda que também recupere um mensal atrasado soma as duas levas: perto de 90, o
 > limite da cota. Mais laboratórios ou mais compradores exigem uma caixa SMTP por comprador,
 > cada uma com a própria cota.
@@ -147,7 +147,7 @@ O `--dry-run` mostra tudo isso antes de qualquer conexão:
 ```
   ATENCAO: mapa@industria.com.br recebe 2 e-mails nesta leva (EUROFARMA, EUROFARMA_RX)
 
-  cota email     0 de 90 usados na ultima hora; cabem mais 90, a leva pede 46
+  cota email     0 de 90 usados na ultima hora; cabem mais 90, a leva pede 45
   teto por rodada: 95 mensagens
 ```
 

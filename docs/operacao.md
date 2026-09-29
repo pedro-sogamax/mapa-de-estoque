@@ -64,7 +64,7 @@ estão em [configuracao.md](configuracao.md#agenda-de-envio).
 | Dia | Gera | Duração |
 |---|---|---|
 | 1º dia útil do mês | os mensais do mês anterior | ~3min30 |
-| Segunda | os semanais de todos os laboratórios | ~3min40 |
+| Segunda | os semanais de quase todos os laboratórios (45 de 46) | ~3min40 |
 | Quarta | os semanais de quem tem quarta cadastrada | ~10 s |
 | Dia sem envio | nada: sai com código 0 sem abrir o navegador | < 1 s |
 

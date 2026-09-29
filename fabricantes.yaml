@@ -77,7 +77,8 @@ fabricantes:
   # `python -m src.disparo --dry-run`, que mostra o destino de cada mensagem.
   # =====================================================================================
   # AGENDA DE 15/09/2026 — de docs/referencia/ENVIO MAPA.xlsx: TODOS com mensal e semanal de segunda;
-  # EUROFARMA_RX e MARJAN tambem na quarta. Entrou a CELLERA (dois codigos), saiu a ASPEN.
+  # EUROFARMA_RX e MARJAN tambem na quarta. Em 29/09/2026 o MEDLEY_GENERICOS passou da
+  # segunda para a quarta (so quarta). Entrou a CELLERA (dois codigos), saiu a ASPEN.
   # =====================================================================================
   # --- ATENCAO: na planilha os codigos das linhas 2 e 3 estao trocados entre si. -------
   # 106975/106976 sao ACHE no Geweb e 9030/42818 sao BIOSINTETICA. Alinhei cada nome aos
@@ -450,7 +451,7 @@ fabricantes:
     codigos:
       - 112481              # MEDLEY FARMACEUTICA - (EXTREMA - MG)
       - 112489              # MEDLEY FARMACEUTICA - ( CAMPINAS - SP)
-    dias_semana: [segunda]
+    dias_semana: [quarta]   # era segunda; mudou para quarta em 29/09/2026
     comprador: *geliana
     contatos: {emails: [Alexandre.Lopes@medley.com.br], copia: [pedro@sogamax.com.br, geliana@sogamax.com.br], canais: [email]}
 
