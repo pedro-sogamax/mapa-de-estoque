@@ -196,6 +196,11 @@ class TestEnvioDoRelatorio:
         relatorio = _situacao(cfg)
         assert (relatorio.fim, relatorio.message_id, relatorio.situacao) == ("2026-09-28", "<id1@x>", AGUARDANDO)
 
+    def test_revisora_na_copia_oculta_nao_recebe_duas_vezes(self, tmp_path, canal):
+        cfg = _cfg(tmp_path, revisao_copia_para=("REVISORA@x.com", "ti@x.com"))
+        enviar_relatorio(cfg, hoje=SEGUNDA)
+        assert canal.enviados[0][0].copia_oculta == ("ti@x.com",)
+
     def test_nao_reenvia_a_mesma_semana(self, tmp_path, canal):
         cfg = _cfg(tmp_path)
         enviar_relatorio(cfg, hoje=SEGUNDA)

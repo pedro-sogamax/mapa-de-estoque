@@ -275,10 +275,13 @@ def enviar_relatorio(cfg: Config, hoje: date | None = None, erro_da_rodada: str 
     assunto, corpo = montar_relatorio(
         eventos, inicio, fim, erro_da_rodada if hoje == fim else "", com_anexo=anexo is not None
     )
+    # Quem ja e destinatario nao entra de novo na copia oculta: receberia duas copias, e
+    # abrir uma deixaria a outra como nao lida na mesma caixa que e conferida.
+    ja_recebe = {e.casefold() for e in cfg.revisao_para}
     destino = Destino(
         fabricante="revisao semanal",
         emails=cfg.revisao_para,
-        copia_oculta=cfg.revisao_copia_para,
+        copia_oculta=tuple(e for e in cfg.revisao_copia_para if e.casefold() not in ja_recebe),
     )
     try:
         with CanalEmail(cfg) as canal:
