@@ -90,6 +90,24 @@ sem ele. Veja [O comprador](#o-comprador).
 
 O porquê de cada limite está em [envio.md](envio.md#proteções-contra-descontrole).
 
+### Revisão semanal
+
+Como funciona em [operacao.md](operacao.md#a-revisão-semanal).
+
+| Variável | Padrão | Para que serve |
+|---|---|---|
+| `REVISAO_PARA` | | Revisora que recebe o relatório da semana. **Vazio desliga a revisão inteira** |
+| `REVISAO_COPIA_PARA` | | Cópia oculta do relatório. Não interfere na conferência |
+| `REVISAO_ALERTA_PARA` | `ALERTA_PARA` | Quem é avisado quando o relatório não é aberto no prazo |
+| `REVISAO_PRAZO_DIAS` | `3` | Prazo em **dias úteis**. `3` = relatório de segunda, alerta na quinta |
+| `REVISAO_IMAP_USUARIO` / `REVISAO_IMAP_SENHA` | | A caixa da revisora — a **mesma** do `REVISAO_PARA`. A automação só lê a marca de lida |
+| `IMAP_HOST` | `SMTP_HOST` | Servidor IMAP. Na Locaweb é o mesmo do SMTP |
+| `IMAP_PORTA` | `993` | Porta IMAP com SSL |
+
+> ⚠️ Para **testar** antes de ligar para a revisora, aponte `REVISAO_PARA` e
+> `REVISAO_IMAP_USUARIO`/`REVISAO_IMAP_SENHA` para a **sua** caixa. Com o `REVISAO_PARA` numa
+> caixa e o IMAP em outra, a mensagem nunca é encontrada — o log avisa.
+
 ## O arquivo fabricantes.yaml
 
 Uma entrada por relatório. O cabeçalho do próprio arquivo documenta cada campo, e a fonte do

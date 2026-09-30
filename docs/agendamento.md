@@ -1,7 +1,13 @@
 # Agendamento
 
-A automação roda pelo Agendador de Tarefas do Windows, com **uma tarefa só, todo dia útil às
-07:00**. A agenda está dentro do script: ele decide o que gerar em cada dia, e num dia sem
+A automação roda pelo Agendador de Tarefas do Windows, com **duas tarefas**:
+
+| Tarefa | Quando | O quê |
+|---|---|---|
+| `Mapa de Estoque - Geweb` | todo dia útil, 07:00 | a rodada: extrai, envia e, na segunda, manda o relatório semanal |
+| `Mapa de Estoque - Leitura` | dias úteis, de hora em hora, 08:00 às 18:00 | só confere se a revisora abriu o relatório — veja [abaixo](#a-conferência-de-leitura) |
+
+A agenda de extração está dentro do script: ele decide o que gerar em cada dia, e num dia sem
 envio sai em menos de um segundo, sem abrir o navegador. Não crie uma tarefa por
 periodicidade.
 
@@ -70,3 +76,32 @@ Para conferir um dia específico, abra a planilha de histórico do mês (veja
 [operacao.md](operacao.md#o-histórico-em-excel)) ou o `logs\agendador.log`, que traz início,
 fim e código de saída de cada rodada. O código **3** significa "os relatórios saíram, mas
 algum e-mail não foi entregue".
+
+## A conferência de leitura
+
+Só com a [revisão semanal](operacao.md#a-revisão-semanal) ligada (`REVISAO_PARA` no `.env`).
+De hora em hora, das 08:00 às 18:00 nos dias úteis, `python -m src.revisao` entra na caixa da
+revisora, **só para ler**, e confere se o relatório da semana foi aberto.
+
+Custa quase nada: sem relatório aguardando leitura — a maior parte da semana —, sai em cerca
+de um segundo sem conectar a nada; com um aguardando, leva de 2 a 3 segundos. Só escreve no
+`logs\revisao.log` e só regrava a planilha quando algo muda.
+
+Se cair durante a rodada das 07:00, ela pula aquela hora: as duas gravam no mesmo
+`dados\revisoes.json` e na mesma planilha, e uma trava (`dados\rodada.trava`) impede que se
+atropelem.
+
+A tarefa chama o `pythonw.exe`, e não o `python.exe`: sem ele, uma janela de console piscaria
+na tela a cada hora.
+
+```powershell
+$raiz = "C:\caminho\para\mapa-de-estoque"
+$acao = New-ScheduledTaskAction -Execute (Join-Path $raiz ".venv\Scripts\pythonw.exe") -Argument "-m src.revisao" -WorkingDirectory $raiz
+$gatilho = New-ScheduledTaskTrigger -Weekly -DaysOfWeek Monday,Tuesday,Wednesday,Thursday,Friday -At 8:00am
+$gatilho.Repetition = (New-ScheduledTaskTrigger -Once -At 8:00am -RepetitionInterval (New-TimeSpan -Hours 1) -RepetitionDuration (New-TimeSpan -Hours 10 -Minutes 1)).Repetition
+$config = New-ScheduledTaskSettingsSet -StartWhenAvailable -DontStopIfGoingOnBatteries -AllowStartIfOnBatteries -ExecutionTimeLimit (New-TimeSpan -Minutes 5)
+Register-ScheduledTask -TaskName "Mapa de Estoque - Leitura" -Action $acao -Trigger $gatilho -Settings $config -Force
+```
+
+Como a da rodada, **só uma máquina** pode ter esta tarefa habilitada, e ela roda com o mesmo
+usuário da outra.

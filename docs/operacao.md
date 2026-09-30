@@ -169,6 +169,8 @@ contador:
 | `logs\agendador.log` | Início, fim e código de saída de cada rodada agendada |
 | `logs\historico.jsonl` | Um evento por laboratório e etapa: a fonte da planilha de histórico |
 | `logs\envios.jsonl` | Uma linha por mensagem que saiu: auditoria e cota horária |
+| `logs\revisao.log` | A conferência de leitura de hora em hora. Só escreve quando algo muda |
+| `logs\revisoes\` | A planilha de cada semana, anexa ao relatório semanal |
 
 ## O histórico, em Excel
 
@@ -187,6 +189,7 @@ filtrando a coluna `COMPRADOR`:
 | `Envios` | mensagem | data, hora, comprador, laboratório, período, canal, destinatário, **resultado**, **motivo**, id |
 | `Extracoes` | relatório | data, hora, comprador, laboratório, período, **resultado**, **motivo**, arquivo |
 | `Rodadas` | dia + etapa | data, etapa, ok, falha, não tentado, total |
+| `Revisoes` | relatório semanal | semana, enviado em, lido até, situação — só com a [revisão semanal](#a-revisão-semanal) ligada |
 
 O `resultado` é `ok`, `falha` ou `nao tentado` (e `sem dados`, na extração). **O que não saiu é
 registrado junto com o motivo.**
@@ -202,6 +205,46 @@ Excel, o Windows trava a gravação: a rodada apenas avisa e segue, porque o dad
 > ⚠️ O nome da planilha **não pode começar com número seguido de `_`**. A pasta fica dentro do
 > `FORMATADO_DIR`, e o [src/sequencia.py](../src/sequencia.py) contaria o arquivo como
 > relatório numerado. `2026-09.xlsx` é seguro, e há teste cobrindo isso.
+
+## A revisão semanal
+
+A diretoria pediu que o histórico fosse revisado toda semana e que ficasse registrado que foi
+visto, **sem nenhuma etapa manual**. A decisão e o porquê de cada escolha estão na
+[proposta aprovada](propostas/revisao-semanal.md). Liga com `REVISAO_PARA` no `.env` (veja
+[configuracao.md](configuracao.md#revisão-semanal)); vazio, nada disso acontece.
+
+1. **Segunda-feira, no fim da rodada agendada,** a revisora recebe o resumo da semana (terça a
+   segunda) no corpo do e-mail: extrações e envios, e cada falha, nomeada. A planilha só
+   daquela semana vai anexa. Se a rodada quebrar, o relatório sai mesmo assim, contando a falha.
+2. **Ela abre o e-mail.** O servidor da Locaweb marca a mensagem como lida.
+3. **De hora em hora, das 8h às 18h,** a automação entra na caixa dela, **só para ler**, e
+   confere essa marca. A aba `Revisoes` mostra a situação de cada semana:
+
+| Situação | Quando |
+|---|---|
+| Aguardando leitura | Enviado, ainda dentro do prazo |
+| Lido | Aberto dentro do prazo. "Lido até" é a hora da conferência que achou a marca |
+| Sem leitura | Não aberto em `REVISAO_PRAZO_DIAS` dias úteis. A gerente recebe **um** e-mail |
+| Lido após o prazo | Aberto depois do alerta, antes do relatório da semana seguinte |
+
+**O relatório se recupera sozinho**, como o mensal: se não saiu na segunda (máquina desligada,
+SMTP fora), a primeira rodada seguinte manda o da semana que ficou para trás. Só a rodada da
+agenda com `--enviar` manda o relatório; `--mes`, `--fabricante` e `--comprador` não.
+
+**Não conseguir conferir não é "sem leitura".** Se a senha da caixa da revisora mudar ou o
+servidor cair, a semana continua como *Aguardando leitura* e quem está no `ALERTA_PARA` recebe
+um aviso, no máximo um por dia.
+
+```powershell
+# o registro das semanas, sem conectar a nada
+.venv\Scripts\python -m src.revisao --status
+
+# conferir agora (é o que a tarefa de hora em hora faz)
+.venv\Scripts\python -m src.revisao
+```
+
+O estado fica em `dados\revisoes.json`: é o que impede reenviar o relatório da semana ou
+repetir o alerta. Apagar uma semana dele faz o relatório daquela semana sair de novo.
 
 ## O arquivo formatado
 

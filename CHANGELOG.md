@@ -3,6 +3,14 @@
 Mudanças relevantes para quem opera ou mantém o Mapa de Estoque, da mais recente para a mais
 antiga. O detalhe de cada uma está no histórico do git.
 
+## 2026-09-30
+
+- **Revisão semanal.** Com `REVISAO_PARA` no `.env`, a rodada de segunda manda à revisora o
+  resumo da semana, com a planilha da semana anexa, e uma tarefa de hora em hora confere na
+  caixa dela, só lendo, se o e-mail foi aberto. A planilha de histórico ganhou a aba
+  `Revisoes`; sem leitura em `REVISAO_PRAZO_DIAS` dias úteis, a gerente é avisada. Nova
+  tarefa agendada: `Mapa de Estoque - Leitura` (veja `docs/agendamento.md`).
+
 ## 2026-09-29
 
 - O MEDLEY_GENERICOS (códigos 112481 e 112489) passou do semanal de segunda para o de quarta.

@@ -66,7 +66,7 @@ git e precisa ser copiado à parte:
 | O quê | Por que importa |
 |---|---|
 | `.env` | Credenciais do Geweb e do SMTP, e as travas de teste |
-| `dados\` | Registro do que já foi extraído e enviado (`estado.json`, `envios.json`, `sequencia.json`, `ultima-rodada.json`). **Sem ele, a máquina nova reenvia mapas às indústrias e reinicia a numeração dos arquivos** |
+| `dados\` | Registro do que já foi extraído e enviado (`estado.json`, `envios.json`, `sequencia.json`, `ultima-rodada.json`) e das revisões semanais (`revisoes.json`). **Sem ele, a máquina nova reenvia mapas às indústrias e reinicia a numeração dos arquivos** |
 | `logs\historico.jsonl` e `logs\envios.jsonl` | Histórico das rodadas e a contagem da cota horária de envio. Opcional, mas sem eles a planilha de histórico recomeça do zero |
 
 Não copie `.venv\` nem `.auth\`: o ambiente é recriado pela instalação, e a sessão do Geweb é
@@ -74,10 +74,11 @@ refeita no primeiro login.
 
 Passo a passo:
 
-1. **Desabilite a tarefa agendada na máquina antiga.** Duas máquinas rodando ao mesmo tempo
-   enviam em dobro e disputam a sessão do Geweb.
+1. **Desabilite as duas tarefas agendadas na máquina antiga.** Duas máquinas rodando ao mesmo
+   tempo enviam em dobro e disputam a sessão do Geweb.
    ```powershell
    schtasks /Change /TN "Mapa de Estoque - Geweb" /DISABLE
+   schtasks /Change /TN "Mapa de Estoque - Leitura" /DISABLE
    ```
 2. Na máquina nova, clone o repositório e faça os passos 1 e 2 acima.
 3. Copie o `.env` e a pasta `dados\` da máquina antiga.
@@ -87,8 +88,9 @@ Passo a passo:
 5. Confirme que o usuário da tarefa agendada tem permissão de escrita na pasta de saída.
 6. Rode a validação (passos 2, 4 e 8 são o mínimo) e confira que o `--planejar` não propõe
    reenviar nada que já saiu.
-7. Crie a tarefa agendada na máquina nova, com o caminho novo. Veja
-   [agendamento.md](agendamento.md#criar-a-tarefa).
+7. Crie as duas tarefas agendadas na máquina nova, com o caminho novo. Veja
+   [agendamento.md](agendamento.md#criar-a-tarefa) e
+   [a conferência de leitura](agendamento.md#a-conferência-de-leitura).
 
 ## Atualizar
 

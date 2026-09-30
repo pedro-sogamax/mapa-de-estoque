@@ -23,11 +23,11 @@ A visão geral e o início rápido estão no [README do projeto](../README.md).
 
 ## Propostas
 
-Ideias ainda **não implementadas**, guardadas para decisão.
+Ideias guardadas para decisão, e o registro das já aprovadas: o porquê de cada escolha.
 
 | Documento | Situação |
 |---|---|
-| [propostas/revisao-semanal.md](propostas/revisao-semanal.md) — com [fluxograma](propostas/revisao-semanal-fluxograma.html) | Relatório semanal à revisora, com a leitura conferida pela marcação de lida na caixa dela (IMAP). Mecanismo testado; aprovada pela diretoria em 30/09/2026, a implementar |
+| [propostas/revisao-semanal.md](propostas/revisao-semanal.md) — com [fluxograma](propostas/revisao-semanal-fluxograma.html) | Relatório semanal à revisora, com a leitura conferida pela marcação de lida na caixa dela (IMAP). Aprovada e implementada em 30/09/2026. Operação em [operacao.md](operacao.md#a-revisão-semanal) |
 
 ## Referência
 

@@ -12,7 +12,8 @@ Como o código está organizado e como testar uma mudança.
 Os testes cobrem as partes que decidem tudo e **não tocam rede nem navegador**: o calendário
 (`src/periodo.py`: 1º dia útil com feriado, virada de ano, as duas janelas semanais), a agenda
 (`src/agenda.py`: quem roda hoje e a recuperação do mensal atrasado), a validação do cadastro
-(`src/config.py`), o alerta, o histórico e a organização das pastas. Rodam em menos de um
+(`src/config.py`), o alerta, o histórico, a revisão semanal (com a caixa IMAP simulada: o
+teste garante que a conferência só abre pastas em modo leitura) e a organização das pastas. Rodam em menos de um
 segundo.
 
 Um dos testes carrega o **`fabricantes.yaml` de produção**: qualquer edição no cadastro real
@@ -45,6 +46,8 @@ A validação ponta a ponta, com o Geweb de verdade, está em
 | [src/alerta.py](../src/alerta.py) | Avisa por e-mail quando a rodada não termina limpa |
 | [src/log.py](../src/log.py) | Configuração única do log, com rotação (1 MB × 5 gerações) |
 | [src/historico.py](../src/historico.py) | Histórico estruturado das rodadas e as planilhas mensais que os compradores abrem |
+| [src/revisao.py](../src/revisao.py) | Revisão semanal: o relatório à revisora e a conferência, só leitura, de que ela o abriu |
+| [src/trava.py](../src/trava.py) | Trava entre a rodada e a conferência de hora em hora |
 | [templates/](../templates/) | Texto e assinatura das mensagens |
 | [tests/](../tests/) | Testes automatizados |
 

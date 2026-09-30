@@ -1,6 +1,6 @@
 # Revisão semanal do histórico, com confirmação de leitura
 
-Proposta **aprovada pela diretoria em 30/09/2026**, ainda não implementada. Fluxograma: [revisao-semanal-fluxograma.html](revisao-semanal-fluxograma.html)
+Proposta **aprovada pela diretoria e implementada em 30/09/2026**. Como operar: [operacao.md](../operacao.md#a-revisão-semanal). Fluxograma: [revisao-semanal-fluxograma.html](revisao-semanal-fluxograma.html)
 (abra no navegador).
 
 > ## O pedido
@@ -174,6 +174,9 @@ Nada. A diretoria aprovou a proposta em 30/09/2026.
 - **Leitura depois do prazo:** a conferência continua até o relatório seguinte, e a semana
   passa a *Lido após o prazo*, com a data, sem novo e-mail.
 - **Rodada de segunda quebrada:** o relatório sai mesmo assim.
+- **Relatório recuperável** (30/09/2026, na implementação): se não sair na segunda — máquina
+  desligada, SMTP fora —, a primeira rodada seguinte manda o da semana que ficou para trás,
+  como o mensal. Sem isso, uma segunda perdida seria uma semana sem relatório e sem alerta.
 
 Descartados:
 - **Recibo de leitura** (`Disposition-Notification-To`): exigia configurar o Outlook da
