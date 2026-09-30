@@ -30,7 +30,7 @@ from dataclasses import dataclass
 from datetime import date
 from pathlib import Path
 
-from src import alerta, historico
+from src import alerta, historico, revisao
 from src.agenda import Tarefa, tarefas_com_periodo_fixo, tarefas_do_dia
 from src.config import (
     RAIZ_PROJETO,
@@ -51,6 +51,7 @@ from src.periodo import PeriodoInvalido, parsear_data, resolver_periodo
 from src.rodada import ItemDaRodada
 from src.rodada import gravar as gravar_rodada
 from src.sequencia import Sequencia
+from src.trava import Trava
 
 log = logging.getLogger("mapa-estoque")
 
@@ -314,7 +315,7 @@ def _registrar_historico(
                 arquivo=entregue.name if entregue else "",
             )
         )
-    historico.atualizar(cfg.historico_path, cfg.historico_dir, eventos)
+    historico.atualizar(cfg.historico_path, cfg.historico_dir, eventos, cfg.revisoes_path)
 
 
 def _imprimir_resumo(resultados: list[Resultado]) -> None:
@@ -518,6 +519,42 @@ def main(argv: list[str] | None = None) -> int:
 
     if args.planejar:
         return 0
+
+    # A revisao semanal so acompanha a rodada oficial: a da agenda, completa, que envia.
+    # Uma rodada manual (--mes, --fabricante, sem --enviar) nao manda relatorio a ninguem.
+    revisar = (
+        cfg.revisao_ligada
+        and args.enviar
+        and periodo is None
+        and not args.fabricante
+        and not args.comprador
+    )
+    # A conferencia de hora em hora grava no mesmo registro e na mesma planilha. Ela dura
+    # segundos, entao vale esperar; se ainda assim nao der, a rodada segue sem a revisao.
+    trava = Trava(cfg.trava_path)
+    if not trava.adquirir(espera_s=120):
+        log.warning("Outra execucao esta com %s; a revisao semanal fica de fora desta rodada.", cfg.trava_path.name)
+        revisar = False
+    erro_da_rodada: list[str] = []
+    try:
+        codigo = _rodar(cfg, args, tarefas, estado, fabricantes, avisar, erro_da_rodada)
+        if revisar:
+            revisao.ao_fim_da_rodada(cfg, "; ".join(erro_da_rodada))
+        return codigo
+    finally:
+        trava.liberar()
+
+
+def _rodar(
+    cfg: Config,
+    args: argparse.Namespace,
+    tarefas: list[Tarefa],
+    estado: EstadoDaAgenda | None,
+    fabricantes: list[Fabricante],
+    avisar,
+    erro_da_rodada: list[str],
+) -> int:
+    """Extrai, registra e envia. Devolve o codigo de saida; a falha geral vai em `erro_da_rodada`."""
     if not tarefas:
         log.info("Nada a fazer hoje — o Geweb nem sera aberto.")
         # Um cadastro quebrado precisa ser avisado mesmo num dia sem extracao: e justamente
@@ -530,11 +567,13 @@ def main(argv: list[str] | None = None) -> int:
     except SeletoresIncompletos as erro:
         log.error("%s", erro)
         avisar(2, [], erro=str(erro))
+        erro_da_rodada.append(str(erro))
         return 2
     except Exception as erro:  # falha de sessao/login: nada foi extraido
         log.error("Execucao interrompida: %s", erro)
         log.debug("Detalhe", exc_info=True)
         avisar(1, [], erro=str(erro))
+        erro_da_rodada.append(str(erro))
         return 1
 
     itens = _registrar_rodada(cfg, resultados)

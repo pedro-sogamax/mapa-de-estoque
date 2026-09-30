@@ -38,6 +38,8 @@ COLUNAS_ENVIO = ["data", "hora", "comprador", "laboratorio", "periodo", "canal",
 COLUNAS_EXTRACAO = ["data", "hora", "comprador", "laboratorio", "periodo",
                     "resultado", "motivo", "arquivo"]
 COLUNAS_RODADA = ["data", "etapa", "ok", "falha", "nao tentado", "total"]
+# A aba da revisao semanal (src/revisao.py). As linhas vem prontas de dados/revisoes.json.
+COLUNAS_REVISAO = ["semana", "enviado em", "lido até", "situação"]
 
 
 def registrar(arquivo: Path, eventos: Iterable[dict[str, Any]]) -> None:
@@ -163,8 +165,53 @@ def _resumo_por_dia(eventos: list[dict[str, Any]]) -> list[list[Any]]:
     return linhas
 
 
-def gerar_planilhas(historico: Path, destino: Path) -> list[Path]:
+def _montar_livro(eventos: list[dict[str, Any]], revisoes: list[list[Any]] | None = None) -> Workbook:
+    wb = Workbook()
+    wb.remove(wb.active)
+    _aba(wb, "Envios", COLUNAS_ENVIO,
+         [_linha(e, COLUNAS_ENVIO) for e in eventos if e.get("tipo") == "envio"])
+    _aba(wb, "Extracoes", COLUNAS_EXTRACAO,
+         [_linha(e, COLUNAS_EXTRACAO) for e in eventos if e.get("tipo") == "extracao"])
+    _aba(wb, "Rodadas", COLUNAS_RODADA, _resumo_por_dia(eventos))
+    if revisoes:
+        _aba(wb, "Revisoes", COLUNAS_REVISAO, revisoes)
+    return wb
+
+
+def gravar_planilha(eventos: list[dict[str, Any]], arquivo: Path) -> Path | None:
+    """Grava UMA planilha com os eventos dados — a da semana, anexa ao relatorio semanal.
+
+    Mesmas abas e mesmo formato da planilha do mes, para quem abre uma reconhecer a outra.
+    Devolve None se nao conseguiu gravar; o relatorio sai sem o anexo, e o detalhe continua
+    na planilha do mes.
+    """
+    try:
+        arquivo.parent.mkdir(parents=True, exist_ok=True)
+        _montar_livro(eventos).save(arquivo)
+    except OSError as erro:
+        log.warning("Nao consegui gravar %s: %s", arquivo, erro)
+        return None
+    return arquivo
+
+
+def linhas_de_revisao(revisoes: Path | None) -> list[list[Any]]:
+    """As linhas da aba Revisoes, lidas de dados/revisoes.json. Vazio sem revisao ligada."""
+    if revisoes is None:
+        return []
+    # Import tardio: src.revisao usa este modulo para montar a planilha da semana.
+    from src.revisao import linhas_da_aba
+
+    return linhas_da_aba(revisoes)
+
+
+def gerar_planilhas(
+    historico: Path, destino: Path, revisoes: list[list[Any]] | None = None
+) -> list[Path]:
     """Reescreve uma planilha por mes em `destino`. Devolve as que conseguiu gravar.
+
+    Com `revisoes`, toda planilha ganha a aba Revisoes com o registro INTEIRO, e nao so as
+    semanas daquele mes: uma semana que cruza a virada do mes teria o envio numa planilha e
+    a leitura na outra.
 
     O nome NAO pode comecar com digito+underscore: src/sequencia.py conta qualquer arquivo
     assim como relatorio numerado, e o contador passaria a pular numeros. "2026-09.xlsx" e
@@ -176,14 +223,7 @@ def gerar_planilhas(historico: Path, destino: Path) -> list[Path]:
 
     gravadas: list[Path] = []
     for mes in sorted({_mes(e) for e in eventos if _mes(e)}):
-        do_mes = [e for e in eventos if _mes(e) == mes]
-        wb = Workbook()
-        wb.remove(wb.active)
-        _aba(wb, "Envios", COLUNAS_ENVIO,
-             [_linha(e, COLUNAS_ENVIO) for e in do_mes if e.get("tipo") == "envio"])
-        _aba(wb, "Extracoes", COLUNAS_EXTRACAO,
-             [_linha(e, COLUNAS_EXTRACAO) for e in do_mes if e.get("tipo") == "extracao"])
-        _aba(wb, "Rodadas", COLUNAS_RODADA, _resumo_por_dia(do_mes))
+        wb = _montar_livro([e for e in eventos if _mes(e) == mes], revisoes)
 
         arquivo = destino / f"{mes}.xlsx"
         try:
@@ -201,15 +241,21 @@ def gerar_planilhas(historico: Path, destino: Path) -> list[Path]:
     return gravadas
 
 
-def atualizar(historico: Path, destino: Path, eventos: Iterable[dict[str, Any]] = ()) -> None:
+def atualizar(
+    historico: Path,
+    destino: Path,
+    eventos: Iterable[dict[str, Any]] = (),
+    revisoes: Path | None = None,
+) -> None:
     """Registra os eventos e reescreve as planilhas. Nunca levanta excecao.
 
     Chamada no fim da extracao e do disparo, quando o trabalho ja terminou: nenhum problema
-    de log pode mudar o codigo de saida de uma rodada que deu certo.
+    de log pode mudar o codigo de saida de uma rodada que deu certo. `revisoes` e o
+    dados/revisoes.json, de onde sai a aba Revisoes.
     """
     try:
         registrar(historico, eventos)
-        gravadas = gerar_planilhas(historico, destino)
+        gravadas = gerar_planilhas(historico, destino, linhas_de_revisao(revisoes))
         if gravadas:
             log.info("Historico: %s", ", ".join(str(caminho) for caminho in gravadas))
     except Exception as erro:  # nenhum log vale derrubar uma rodada que ja terminou
@@ -223,7 +269,9 @@ def main() -> int:
 
     configurar_log("execucao.log")
     cfg = carregar_config()
-    gravadas = gerar_planilhas(cfg.historico_path, cfg.historico_dir)
+    gravadas = gerar_planilhas(
+        cfg.historico_path, cfg.historico_dir, linhas_de_revisao(cfg.revisoes_path)
+    )
     if not gravadas:
         log.info("Nada a gerar: %s esta vazio ou nao existe.", cfg.historico_path)
         return 0

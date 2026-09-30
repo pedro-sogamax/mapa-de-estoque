@@ -559,7 +559,7 @@ def _registrar_historico(
     eventos = [evento(passo, "ok") for passo in enviados]
     eventos += [evento(passo, "falha", erro) for passo, erro in falhas]
     eventos += [evento(passo, "nao tentado", motivo) for passo, motivo in barrados]
-    historico.atualizar(cfg.historico_path, cfg.historico_dir, eventos)
+    historico.atualizar(cfg.historico_path, cfg.historico_dir, eventos, cfg.revisoes_path)
 
 
 def _executar_rascunho(
