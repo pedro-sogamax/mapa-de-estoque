@@ -80,6 +80,18 @@ class Config:
     max_falhas_seguidas: int
     max_tentativas: int
     max_anexo_mb: int
+    # Revisao semanal (src/revisao.py). Com REVISAO_PARA vazio, a revisao fica desligada.
+    revisoes_path: Path = PASTA_DADOS / "revisoes.json"
+    revisoes_dir: Path = RAIZ_PROJETO / "logs" / "revisoes"
+    trava_path: Path = PASTA_DADOS / "rodada.trava"
+    revisao_para: tuple[str, ...] = ()
+    revisao_copia_para: tuple[str, ...] = ()
+    revisao_alerta_para: tuple[str, ...] = ()
+    revisao_prazo_dias: int = 3
+    imap_host: str = ""
+    imap_porta: int = 993
+    revisao_imap_usuario: str = ""
+    revisao_imap_senha: str = ""
 
     def mascarar(self) -> str:
         """Representacao segura para log — sem senha."""
@@ -116,6 +128,16 @@ class Config:
             brutos = self.responder_para.replace(";", ",").split(",")
             return tuple(e for bruto in brutos if (e := bruto.strip()))
         return (self.smtp_usuario,) if self.smtp_usuario else ()
+
+    @property
+    def revisao_ligada(self) -> bool:
+        """Ha revisora cadastrada: a rodada de segunda envia o relatorio e confere a leitura."""
+        return bool(self.revisao_para)
+
+    @property
+    def revisao_alerta_destinatarios(self) -> tuple[str, ...]:
+        """Quem e avisado quando o relatorio nao e lido no prazo. Vazio cai no alerta comum."""
+        return self.revisao_alerta_para or self.alerta_destinatarios
 
 
 @dataclass(frozen=True)
@@ -400,6 +422,17 @@ def carregar_config(headless_override: bool | None = None) -> Config:
     # que nao ter alerta nenhum — e so se descobre no dia em que ele era necessario.
     alerta_para = _enderecos("ALERTA_PARA")
 
+    # Revisao semanal. Os enderecos sao validados como os demais; o prazo precisa ser de ao
+    # menos um dia util, senao o alerta sairia junto com o proprio relatorio.
+    revisao_para = _enderecos("REVISAO_PARA")
+    revisao_copia_para = _enderecos("REVISAO_COPIA_PARA")
+    revisao_alerta_para = _enderecos("REVISAO_ALERTA_PARA")
+    revisao_prazo_dias = _ler_int("REVISAO_PRAZO_DIAS", 3)
+    if revisao_prazo_dias < 1:
+        raise ConfiguracaoInvalida(
+            f"REVISAO_PRAZO_DIAS deve ser de ao menos 1 dia util, recebido: {revisao_prazo_dias}."
+        )
+
     telefone_teste = os.getenv("TELEFONE_TESTE", "").strip()
     if telefone_teste and not _E164.match(telefone_teste):
         raise ConfiguracaoInvalida(
@@ -460,6 +493,15 @@ def carregar_config(headless_override: bool | None = None) -> Config:
         max_falhas_seguidas=_ler_int("MAX_FALHAS_SEGUIDAS", 3),
         max_tentativas=_ler_int("MAX_TENTATIVAS", 3),
         max_anexo_mb=_ler_int("MAX_ANEXO_MB", 10),
+        revisao_para=revisao_para,
+        revisao_copia_para=revisao_copia_para,
+        revisao_alerta_para=revisao_alerta_para,
+        revisao_prazo_dias=revisao_prazo_dias,
+        # Na Locaweb o mesmo servidor atende SMTP e IMAP (email-ssl.com.br).
+        imap_host=os.getenv("IMAP_HOST", "").strip() or os.getenv("SMTP_HOST", "").strip(),
+        imap_porta=_ler_int("IMAP_PORTA", 993),
+        revisao_imap_usuario=os.getenv("REVISAO_IMAP_USUARIO", "").strip(),
+        revisao_imap_senha=os.getenv("REVISAO_IMAP_SENHA", ""),  # sem strip, como a do SMTP
     )
 
 

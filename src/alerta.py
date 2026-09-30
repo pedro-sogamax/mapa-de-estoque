@@ -31,13 +31,23 @@ log = logging.getLogger(__name__)
 MAX_LINHAS = 40
 
 
-def enviar(cfg: Config, assunto: str, linhas: list[str]) -> bool:
+def enviar(
+    cfg: Config,
+    assunto: str,
+    linhas: list[str],
+    destinatarios: tuple[str, ...] | None = None,
+    rodape_tecnico: bool = True,
+) -> bool:
     """Manda o resumo para cfg.alerta_destinatarios. Devolve True se saiu.
+
+    `destinatarios` troca o padrao: o alerta de leitura da revisao semanal vai para a
+    gerente, nao para quem opera a automacao. Para ela, o rodape que aponta os arquivos de
+    log nao diz nada — por isso `rodape_tecnico=False`.
 
     Nunca levanta: qualquer falha vira aviso no log. Quem chama esta terminando a rodada e
     ja tem o desfecho para reportar pelo codigo de saida.
     """
-    destinatarios = cfg.alerta_destinatarios
+    destinatarios = destinatarios or cfg.alerta_destinatarios
     if not destinatarios:
         log.warning("Sem destinatario para o alerta: preencha ALERTA_PARA no .env.")
         return False
@@ -45,7 +55,7 @@ def enviar(cfg: Config, assunto: str, linhas: list[str]) -> bool:
         log.warning("Alerta nao enviado: SMTP nao configurado no .env.")
         return False
 
-    corpo = _montar_corpo(linhas)
+    corpo = _montar_corpo(linhas, rodape_tecnico)
     destino = Destino(fabricante="alerta", emails=tuple(destinatarios))
 
     try:
@@ -60,7 +70,7 @@ def enviar(cfg: Config, assunto: str, linhas: list[str]) -> bool:
     return True
 
 
-def _montar_corpo(linhas: list[str]) -> str:
+def _montar_corpo(linhas: list[str], rodape_tecnico: bool = True) -> str:
     """Texto puro, sem assinatura: e uma mensagem de servico, nao um mapa."""
     mostradas = linhas[:MAX_LINHAS]
     if len(linhas) > MAX_LINHAS:
@@ -69,6 +79,7 @@ def _montar_corpo(linhas: list[str]) -> str:
         "",
         "-" * 62,
         f"Mapa de Estoque — automacao, {datetime.now():%d/%m/%Y %H:%M}.",
-        "Detalhes em logs/execucao.log e logs/disparo.log.",
     ]
+    if rodape_tecnico:
+        rodape.append("Detalhes em logs/execucao.log e logs/disparo.log.")
     return "\n".join(mostradas + rodape)

@@ -58,8 +58,12 @@ def montar_mensagem(
     rascunho: bool = True,
     corpo_html: str = "",
     assinatura_dir: Path | None = None,
+    copia_oculta: list[str] | None = None,
 ) -> EmailMessage:
     """Monta a mensagem completa, com anexo. Nao envia nem grava nada.
+
+    A `copia_oculta` vai no header Bcc, que o smtplib usa para achar os destinatarios e
+    apaga antes de transmitir: quem esta no To e no Cc nao ve quem recebeu em copia oculta.
 
     Com `corpo_html`, a mensagem sai em duas versoes na mesma entrega (multipart/alternative):
     o texto puro e o HTML com a assinatura. Quem nao renderiza HTML — cliente antigo, leitor
@@ -75,6 +79,8 @@ def montar_mensagem(
     msg["To"] = ", ".join(para)
     if copia:
         msg["Cc"] = ", ".join(copia)
+    if copia_oculta:
+        msg["Bcc"] = ", ".join(copia_oculta)
     if remetente:
         msg["From"] = remetente
     if responder_para:

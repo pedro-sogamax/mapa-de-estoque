@@ -39,6 +39,8 @@ class Destino:
     # Resolvido pelo roteador: o comprador deste laboratorio, ou o RESPONDER_PARA do .env.
     # Viaja aqui porque o canal nao conhece fabricante nem cadastro — so o destino.
     responder_para: str = ""
+    # Copia oculta (Bcc): recebe a mensagem sem aparecer para os demais destinatarios.
+    copia_oculta: tuple[str, ...] = ()
 
 
 @dataclass(frozen=True)

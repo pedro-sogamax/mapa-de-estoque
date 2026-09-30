@@ -179,11 +179,12 @@ class CanalEmail:
             rascunho=False,  # X-Unsent so faz sentido no arquivo .eml
             corpo_html=mensagem.corpo_html,
             assinatura_dir=self.cfg.templates_dir / "assinatura",
+            copia_oculta=list(destino.copia_oculta),
         )
 
         recusados = self._enviar_com_retentativa(msg, destino.fabricante)
         if recusados:
             raise FalhaNoEnvio(f"Enderecos recusados pelo servidor: {', '.join(recusados)}")
 
-        aceitos = tuple(destino.emails) + tuple(destino.copia)
+        aceitos = tuple(destino.emails) + tuple(destino.copia) + tuple(destino.copia_oculta)
         return Envio(canal=self.nome, destinatarios=aceitos, identificadores=(msg["Message-ID"],))
