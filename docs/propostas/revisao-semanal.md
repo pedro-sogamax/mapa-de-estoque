@@ -1,6 +1,6 @@
 # Revisão semanal do histórico, com confirmação de leitura
 
-Proposta, **ainda não implementada**. Fluxograma: [revisao-semanal-fluxograma.html](revisao-semanal-fluxograma.html)
+Proposta **aprovada pela diretoria em 30/09/2026**, ainda não implementada. Fluxograma: [revisao-semanal-fluxograma.html](revisao-semanal-fluxograma.html)
 (abra no navegador).
 
 > ## O pedido
@@ -148,7 +148,7 @@ atrasado, 88 + 2 = 90 de 100 — cabe, com pouca folga.
 
 ## 6. Em aberto
 
-- [ ] Aprovação da diretoria.
+Nada. A diretoria aprovou a proposta em 30/09/2026.
 
 ## 7. Decidido em 29/09/2026
 
