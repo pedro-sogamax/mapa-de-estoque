@@ -3,6 +3,13 @@
 Mudanças relevantes para quem opera ou mantém o Mapa de Estoque, da mais recente para a mais
 antiga. O detalhe de cada uma está no histórico do git.
 
+## 2026-10-01
+
+- BAYER_OTC, EUROFARMA_OTC e NOVA_QUIMICA passaram a receber também o mensal: são 46
+  mensais no 1º dia útil, a partir do de setembro de 2026. O pior caso (mensal atrasado
+  recuperado numa segunda) sobe para 91 mensagens e passa em uma a cota horária de 90: a
+  última fica para um disparo depois que a janela abrir (veja `docs/envio.md`).
+
 ## 2026-09-30
 
 - **Revisão semanal.** Com `REVISAO_PARA` no `.env`, a rodada de segunda manda à revisora o

@@ -128,9 +128,11 @@ porque repetir só gasta a reputação do remetente.
 Repetir login com senha errada é o caminho mais curto para o provedor bloquear a conta.
 
 > ⚠️ **A margem da cota é pequena.** A segunda-feira envia uma mensagem por laboratório ativo (45 de 46; o MEDLEY_GENERICOS é de quarta),
-> e uma segunda que também recupere um mensal atrasado soma as duas levas: perto de 90, o
-> limite da cota. Mais laboratórios ou mais compradores exigem uma caixa SMTP por comprador,
-> cada uma com a própria cota.
+> e uma segunda que também recupere um mensal atrasado soma as duas levas: 46 mensais + 45
+> semanais = 91, **uma acima da cota de 90**. Nesse caso o disparo para na 90ª e diz a partir
+> de que hora continuar; a que sobrou sai com `python -m src.disparo` depois disso. Mais
+> laboratórios ou mais compradores exigem uma caixa SMTP por comprador, cada uma com a
+> própria cota.
 
 **Auditoria.** Cada mensagem que sai é registrada em `logs\envios.jsonl`, uma linha por envio,
 só acrescentando:
