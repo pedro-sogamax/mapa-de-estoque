@@ -329,7 +329,6 @@ fabricantes:
 
   - nome: BAYER_OTC
     codigo: 22866           # BAYER S.A. (BARUERI CECI II)
-    mensal: false           # so o semanal — sem X na coluna MENSAL da planilha
     dias_semana: [segunda]
     comprador: *joici
     contatos: {emails: [chafic.publo@terra.com.br], copia: [pedro@sogamax.com.br, joici@sogamax.com.br], canais: [email]}
@@ -351,7 +350,6 @@ fabricantes:
 
   - nome: EUROFARMA_OTC
     codigo: 45484           # EUROFARMA LABORATORIOS - OTC - (VARGINHA - MG
-    mensal: false           # so o semanal — sem X na coluna MENSAL da planilha
     dias_semana: [segunda]
     comprador: *joici
     contatos: {emails: [andrea.vasconcellos@eurofarma.com], copia: [pedro@sogamax.com.br, joici@sogamax.com.br], canais: [email]}
@@ -467,7 +465,6 @@ fabricantes:
       - 50754               # NOVA QUÍMICA (GENÉRICO - JAGUARIUNA - SP)
       - 50755               # NOVA QUÍMICA (GENÉRICO - HORTOLANDIA - SP)
       - 50756               # NOVA QUÍMICA - GENÉRICO - (EXTREMA - MG)
-    mensal: false           # so o semanal — sem X na coluna MENSAL da planilha
     dias_semana: [segunda]
     comprador: *geliana
     contatos: {emails: [renan.santos@novaquimicagenericos.com.br], copia: [pedro@sogamax.com.br, geliana@sogamax.com.br], canais: [email]}
