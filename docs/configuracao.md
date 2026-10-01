@@ -83,7 +83,7 @@ sem ele. Veja [O comprador](#o-comprador).
 | Variável | Padrão | Efeito |
 |---|---|---|
 | `MAX_ENVIOS_POR_RODADA` | `95` | Recusa a leva acima disso, antes de conectar. Pega cadastro duplicado |
-| `MAX_ENVIOS_POR_HORA` | `90` | Cota por canal, abaixo do limite da Locaweb (100/h por caixa) |
+| `MAX_ENVIOS_POR_HORA` | `92` | Cota por canal, abaixo do limite da Locaweb (100/h por caixa) |
 | `MAX_FALHAS_SEGUIDAS` | `3` | Falhas seguidas que desligam um canal |
 | `MAX_TENTATIVAS` | `3` | Tentativas por mensagem, só para erro temporário |
 | `MAX_ANEXO_MB` | `10` | Recusa anexo acima disso |

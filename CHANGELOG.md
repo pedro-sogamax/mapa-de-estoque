@@ -7,8 +7,9 @@ antiga. O detalhe de cada uma está no histórico do git.
 
 - BAYER_OTC, EUROFARMA_OTC e NOVA_QUIMICA passaram a receber também o mensal: são 46
   mensais no 1º dia útil, a partir do de setembro de 2026. O pior caso (mensal atrasado
-  recuperado numa segunda) sobe para 91 mensagens e passa em uma a cota horária de 90: a
-  última fica para um disparo depois que a janela abrir (veja `docs/envio.md`).
+  recuperado numa segunda) sobe para 91 mensagens.
+- A cota por hora (`MAX_ENVIOS_POR_HORA`) passou de 90 para 92, para caber esse pior caso.
+  Com os 2 e-mails da revisão são 93 dos 100 por hora que a Locaweb aceita na caixa.
 
 ## 2026-09-30
 

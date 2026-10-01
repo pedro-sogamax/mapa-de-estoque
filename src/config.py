@@ -489,7 +489,7 @@ def carregar_config(headless_override: bool | None = None) -> Config:
         # semanal, que soma as duas levas. Com uma caixa SMTP so, esse pior caso ja encosta
         # na cota horaria — o proximo comprador exige uma caixa por comprador.
         max_envios_por_rodada=_ler_int("MAX_ENVIOS_POR_RODADA", 95),
-        max_envios_por_hora=_ler_int("MAX_ENVIOS_POR_HORA", 90),
+        max_envios_por_hora=_ler_int("MAX_ENVIOS_POR_HORA", 92),
         max_falhas_seguidas=_ler_int("MAX_FALHAS_SEGUIDAS", 3),
         max_tentativas=_ler_int("MAX_TENTATIVAS", 3),
         max_anexo_mb=_ler_int("MAX_ANEXO_MB", 10),
