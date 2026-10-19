@@ -3,6 +3,14 @@
 Mudanças relevantes para quem opera ou mantém o Mapa de Estoque, da mais recente para a mais
 antiga. O detalhe de cada uma está no histórico do git.
 
+## 2026-10-19
+
+- Entrou a EMS_OTC (códigos 47228 e 58532, num relatório só), na carteira da Joici: semanal
+  de segunda e mensal, para tainah.souza@grupoems.com. São 47 laboratórios ativos; a segunda
+  passa a 46 semanais, e o pior caso (mensal atrasado recuperado numa segunda) a 93.
+- A cota por hora (`MAX_ENVIOS_POR_HORA`) passou de 92 para 93, para caber esse pior caso.
+  Com os 2 e-mails da revisão são 95 dos 100 por hora que a Locaweb aceita na caixa.
+
 ## 2026-10-01
 
 - BAYER_OTC, EUROFARMA_OTC e NOVA_QUIMICA passaram a receber também o mensal: são 46

@@ -111,7 +111,7 @@ além do razoável**, que é o que faz um provedor suspender a conta de e-mail d
 | Proteção | Padrão | O que ela impede |
 |---|---|---|
 | **Teto por rodada** | 95 | Um cadastro duplicado ou um manifesto errado virar centenas de mensagens. Recusa **antes de conectar**, com código 2. `--forcar` libera |
-| **Cota por hora** | 92/canal | Estourar o limite da Locaweb (100/h por caixa). Ao atingir, para e diz a partir de que hora continuar |
+| **Cota por hora** | 93/canal | Estourar o limite da Locaweb (100/h por caixa). Ao atingir, para e diz a partir de que hora continuar |
 | **Disjuntor** | 3 falhas | Insistir com um servidor que já está recusando tudo. Desliga aquele canal; os outros seguem |
 | **Retentativa** | 3 tentativas | Perder um envio por instabilidade passageira, mas **só** repete erro temporário |
 | **Anexo grande** | 10 MB | Anexar o arquivo errado |
@@ -127,9 +127,9 @@ porque repetir só gasta a reputação do remetente.
 **Credencial recusada é caso à parte:** uma tentativa e a leva inteira para, com código 3.
 Repetir login com senha errada é o caminho mais curto para o provedor bloquear a conta.
 
-> ⚠️ **A margem da cota é pequena.** A segunda-feira envia uma mensagem por laboratório ativo (45 de 46; o MEDLEY_GENERICOS é de quarta),
-> e uma segunda que também recupere um mensal atrasado soma as duas levas: 46 mensais + 45
-> semanais = 91, **uma abaixo da cota de 92**. Somados os 2 e-mails da revisão, são 93 dos
+> ⚠️ **A margem da cota é pequena.** A segunda-feira envia uma mensagem por laboratório ativo (46 de 47; o MEDLEY_GENERICOS é de quarta),
+> e uma segunda que também recupere um mensal atrasado soma as duas levas: 47 mensais + 46
+> semanais = 93, **exatamente a cota de 93**. Somados os 2 e-mails da revisão, são 95 dos
 > 100 por hora que a Locaweb aceita na caixa. Mais laboratórios ou mais compradores exigem
 > uma caixa SMTP por comprador, cada uma com a própria cota.
 
@@ -148,7 +148,7 @@ O `--dry-run` mostra tudo isso antes de qualquer conexão:
 ```
   ATENCAO: mapa@industria.com.br recebe 2 e-mails nesta leva (EUROFARMA, EUROFARMA_RX)
 
-  cota email     0 de 92 usados na ultima hora; cabem mais 92, a leva pede 45
+  cota email     0 de 93 usados na ultima hora; cabem mais 93, a leva pede 46
   teto por rodada: 95 mensagens
 ```
 

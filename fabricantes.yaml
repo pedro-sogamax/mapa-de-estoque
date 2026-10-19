@@ -314,7 +314,7 @@ fabricantes:
 
   # =====================================================================================
   # CARTEIRA DE JOICI RANGEL (16/09/2026).
-  # EUROFARMA_OTC e BAYER_OTC sao os primeiros fabricantes SEM mensal: so o semanal.
+  # EUROFARMA_OTC e BAYER_OTC eram so semanais; recebem tambem o mensal desde 01/10/2026.
   # =====================================================================================
 
   - nome: ABBOTT
@@ -347,6 +347,16 @@ fabricantes:
     dias_semana: [segunda]
     comprador: *joici
     contatos: {emails: [herbert.domingues@cristalia.com.br], copia: [pedro@sogamax.com.br, joici@sogamax.com.br], canais: [email]}
+
+  # Incluido em 19/10/2026: os dois codigos OTC da EMS somados num relatorio so.
+  # O contato nao e o roberto.mattos@, que recebe a EMS_RX e a LAFIMAN (carteira do Yuri).
+  - nome: EMS_OTC
+    codigos:
+      - 47228               # EMS - OTC - (CHACARA ASSAY - SP)
+      - 58532               # EMS OTC - (EXTREMA - MG)
+    dias_semana: [segunda]
+    comprador: *joici
+    contatos: {emails: [tainah.souza@grupoems.com], copia: [pedro@sogamax.com.br, joici@sogamax.com.br], canais: [email]}
 
   - nome: EUROFARMA_OTC
     codigo: 45484           # EUROFARMA LABORATORIOS - OTC - (VARGINHA - MG
