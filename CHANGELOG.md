@@ -5,6 +5,14 @@ antiga. O detalhe de cada uma está no histórico do git.
 
 ## 2026-10-23
 
+- **Envio real às indústrias a partir de 26/10/2026**, pela tarefa agendada às 08:30 nos dias
+  úteis. A cópia do cadastro passa a ser só o comprador de cada laboratório; a resposta da
+  indústria continua indo ao comprador pelo `Reply-To`.
+- Novas variáveis `COPIA_TEMPORARIA` e `COPIA_TEMPORARIA_ATE`: substituem a cópia do cadastro
+  até a data, inclusive. O primeiro envio real (26/10) sai só com pedro@ em cópia; a partir de
+  27/10 volta a valer a do cadastro.
+- A revisão semanal foi religada, com a tarefa `Mapa de Estoque - Leitura`.
+
 - Entraram as duas LUXBIOTECH da `ENVIO MAPA.xlsx`, semanal de segunda e mensal:
   LUXBIOTECH (61596, carteira do Yuri, para roberto.mattos@ems.com.br) e
   LUXBIOTECH_EMS_HPC (44421, 58532 e 47228 num relatório só, carteira da Joici, para

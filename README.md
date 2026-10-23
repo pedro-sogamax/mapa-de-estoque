@@ -9,7 +9,7 @@ Quarenta e seis vezes por semana, entre quatro compradores.
 
 | | |
 |---|---|
-| **Situação** | Em homologação: extração em produção, envio real travado pelo `DESTINATARIO_TESTE` |
+| **Situação** | Em produção desde 26/10/2026: extração e envio às indústrias automáticos |
 | **Laboratórios** | 48 ativos, em 4 carteiras de compradores (outubro/2026) |
 | **Rodada mais pesada** | segunda-feira: 47 relatórios em ~3min40 |
 | **Canais** | e-mail (em uso) e WhatsApp (implementado, sem provedor contratado) |

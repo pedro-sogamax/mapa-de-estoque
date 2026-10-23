@@ -57,6 +57,8 @@ nunca fica, o `DOWNLOAD_DIR` pode ser local e só o `FORMATADO_DIR` apontar para
 | `RESPONDER_PARA` | não | | `Reply-To` padrão, mesmo critério. Aceita vários, separados por vírgula |
 | `REMETENTE` | não | | `From` da mensagem. Deixe vazio: a Locaweb exige que assine a própria caixa do `SMTP_USUARIO` |
 | `DESTINATARIO_TESTE` | não | | **Trava de teste do e-mail.** Preenchido, todo e-mail vai para esses endereços e a `copia` é suprimida. Aceita vários, separados por vírgula |
+| `COPIA_TEMPORARIA` | não | | Substitui a `copia` do cadastro em todos os envios até `COPIA_TEMPORARIA_ATE`, inclusive. No dia seguinte volta sozinha a do cadastro |
+| `COPIA_TEMPORARIA_ATE` | só com a anterior | | Último dia da cópia temporária, `AAAA-MM-DD` |
 | `TELEFONE_TESTE` | não | | **Trava de teste do WhatsApp**, independente da de e-mail |
 | `ALERTA_PARA` | não | | Quem recebe o aviso de falha da rodada. Vazio não desliga: cai no `RESPONDER_PARA` e, na falta dele, na caixa que envia |
 | `ENVIOS_DIR` | não | `envios` | Onde os rascunhos são gravados, só com `--rascunho` |

@@ -6,6 +6,7 @@ import logging
 import os
 import re
 from dataclasses import dataclass, field
+from datetime import date
 from pathlib import Path
 
 import yaml
@@ -92,6 +93,21 @@ class Config:
     imap_porta: int = 993
     revisao_imap_usuario: str = ""
     revisao_imap_senha: str = ""
+    # Copia que substitui a do cadastro ate uma data, inclusive. Veja copia_do_dia.
+    copia_temporaria: tuple[str, ...] = ()
+    copia_temporaria_ate: date | None = None
+
+    def copia_do_dia(self, copia_do_cadastro: tuple[str, ...], hoje: date | None = None) -> tuple[str, ...]:
+        """A copia de um envio: a temporaria ate COPIA_TEMPORARIA_ATE, depois a do cadastro.
+
+        Existe para a virada de homologacao para producao: o primeiro envio real sai so com
+        quem acompanha a implantacao em copia, e a partir do dia seguinte cada comprador volta
+        a receber a copia dos seus laboratorios, sem ninguem precisar mexer em nada.
+        """
+        referencia = hoje or date.today()
+        if self.copia_temporaria and self.copia_temporaria_ate and referencia <= self.copia_temporaria_ate:
+            return self.copia_temporaria
+        return copia_do_cadastro
 
     def mascarar(self) -> str:
         """Representacao segura para log — sem senha."""
@@ -433,6 +449,21 @@ def carregar_config(headless_override: bool | None = None) -> Config:
             f"REVISAO_PRAZO_DIAS deve ser de ao menos 1 dia util, recebido: {revisao_prazo_dias}."
         )
 
+    # As duas andam juntas: copia sem data valeria para sempre, e data sem copia nao faz nada
+    # — nos dois casos, quase certamente uma linha esquecida no .env.
+    copia_temporaria = _enderecos("COPIA_TEMPORARIA")
+    bruto_ate = os.getenv("COPIA_TEMPORARIA_ATE", "").strip()
+    if bool(copia_temporaria) != bool(bruto_ate):
+        raise ConfiguracaoInvalida(
+            "COPIA_TEMPORARIA e COPIA_TEMPORARIA_ATE andam juntas: preencha as duas ou nenhuma."
+        )
+    try:
+        copia_temporaria_ate = date.fromisoformat(bruto_ate) if bruto_ate else None
+    except ValueError as erro:
+        raise ConfiguracaoInvalida(
+            f"COPIA_TEMPORARIA_ATE deve ser uma data AAAA-MM-DD, recebido: {bruto_ate!r}"
+        ) from erro
+
     telefone_teste = os.getenv("TELEFONE_TESTE", "").strip()
     if telefone_teste and not _E164.match(telefone_teste):
         raise ConfiguracaoInvalida(
@@ -502,6 +533,8 @@ def carregar_config(headless_override: bool | None = None) -> Config:
         imap_porta=_ler_int("IMAP_PORTA", 993),
         revisao_imap_usuario=os.getenv("REVISAO_IMAP_USUARIO", "").strip(),
         revisao_imap_senha=os.getenv("REVISAO_IMAP_SENHA", ""),  # sem strip, como a do SMTP
+        copia_temporaria=copia_temporaria,
+        copia_temporaria_ate=copia_temporaria_ate,
     )
 
 

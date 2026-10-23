@@ -89,9 +89,11 @@ def _destino(
     O `responder_para` sai do comprador deste laboratorio; sem ele, do .env. A trava de teste
     NAO o sobrepoe: ela protege quem RECEBE o mapa, e mandar a resposta para o comprador certo
     e o comportamento correto mesmo em homologacao — e o que se quer conferir.
+
+    Fora do teste, a copia do cadastro pode estar trocada pela COPIA_TEMPORARIA do .env.
     """
     emails = cfg.destinatario_teste or contatos.emails
-    copia = () if cfg.destinatario_teste else contatos.copia
+    copia = () if cfg.destinatario_teste else cfg.copia_do_dia(contatos.copia)
     telefones = (cfg.telefone_teste,) if cfg.telefone_teste else contatos.whatsapp
     responder_para = comprador.responder_para if comprador else ""
     return Destino(

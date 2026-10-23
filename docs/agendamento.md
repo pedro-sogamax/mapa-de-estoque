@@ -4,7 +4,7 @@ A automação roda pelo Agendador de Tarefas do Windows, com **duas tarefas**:
 
 | Tarefa | Quando | O quê |
 |---|---|---|
-| `Mapa de Estoque - Geweb` | todo dia útil, 07:00 | a rodada: extrai, envia e, na segunda, manda o relatório semanal |
+| `Mapa de Estoque - Geweb` | todo dia útil, 08:30 | a rodada: extrai, envia e, na segunda, manda o relatório semanal |
 | `Mapa de Estoque - Leitura` | dias úteis, de hora em hora, 08:00 às 18:00 | só confere se a revisora abriu o relatório — veja [abaixo](#a-conferência-de-leitura) |
 
 A agenda de extração está dentro do script: ele decide o que gerar em cada dia, e num dia sem
@@ -25,8 +25,9 @@ Para voltar ao arranjo de extrair agendado e enviar à mão, tire o `--enviar` d
 
 ## Situação atual
 
-> **A tarefa existe e está DESABILITADA.** Foi criada com o gatilho e o caminho corretos, mas
-> não dispara enquanto a homologação não terminar. Até lá, as rodadas são manuais.
+> **As duas tarefas estão HABILITADAS** na máquina do Pedro desde 23/10/2026, com a rodada às
+> 08:30, e o envio às indústrias liberado (`DESTINATARIO_TESTE` vazio) a partir de 26/10/2026.
+> Na migração para a VM, desabilite as duas aqui antes de habilitar lá.
 
 ```powershell
 # conferir o estado
@@ -50,14 +51,14 @@ aspas, porque o caminho pode ter espaços e acentos:
 ```powershell
 $raiz = "C:\caminho\para\mapa-de-estoque"
 $acao = New-ScheduledTaskAction -Execute (Join-Path $raiz "executar.bat") -WorkingDirectory $raiz
-$gatilho = New-ScheduledTaskTrigger -Weekly -DaysOfWeek Monday,Tuesday,Wednesday,Thursday,Friday -At 7:00am
+$gatilho = New-ScheduledTaskTrigger -Weekly -DaysOfWeek Monday,Tuesday,Wednesday,Thursday,Friday -At 8:30am
 $config = New-ScheduledTaskSettingsSet -StartWhenAvailable -DontStopIfGoingOnBatteries -AllowStartIfOnBatteries
 Register-ScheduledTask -TaskName "Mapa de Estoque - Geweb" -Action $acao -Trigger $gatilho -Settings $config -Force
 Disable-ScheduledTask -TaskName "Mapa de Estoque - Geweb"   # habilite só depois de homologar
 ```
 
 `-StartWhenAvailable` faz a tarefa rodar assim que a máquina voltar, se estava desligada às
-07:00. É o que o mensal recuperável espera (veja
+08:30. É o que o mensal recuperável espera (veja
 [operacao.md](operacao.md#o-mensal-se-recupera-sozinho)).
 
 Num servidor, configure a tarefa para rodar **"estando o usuário conectado ou não"**, com um
@@ -87,7 +88,7 @@ Custa quase nada: sem relatório aguardando leitura — a maior parte da semana 
 de um segundo sem conectar a nada; com um aguardando, leva de 2 a 3 segundos. Só escreve no
 `logs\revisao.log` e só regrava a planilha quando algo muda.
 
-Se cair durante a rodada das 07:00, ela pula aquela hora: as duas gravam no mesmo
+Se cair durante a rodada das 08:30, ela pula aquela hora: as duas gravam no mesmo
 `dados\revisoes.json` e na mesma planilha, e uma trava (`dados\rodada.trava`) impede que se
 atropelem.
 

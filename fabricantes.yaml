@@ -94,7 +94,7 @@ fabricantes:
       cargo: Compras
       telefones: 0800 022 1210 / (22) 2785-2614 / (22) 98817-5168
       responder_para: yuritoso@sogamax.com.br
-    contatos: {emails: [neymar.silva@ache.com.br], copia: [pedro@sogamax.com.br, yuritoso@sogamax.com.br], canais: [email]}
+    contatos: {emails: [neymar.silva@ache.com.br], copia: [yuritoso@sogamax.com.br], canais: [email]}
 
   - nome: BIOSINTETICA_RX
     codigos:
@@ -102,7 +102,7 @@ fabricantes:
       - 42818               # BIOSINTÉTICA RX - ( CD AGUA CHATA)
     dias_semana: [segunda]
     comprador: *yuri
-    contatos: {emails: [lindomar.amaral@biosintetica.com.br], copia: [pedro@sogamax.com.br, yuritoso@sogamax.com.br], canais: [email]}
+    contatos: {emails: [lindomar.amaral@biosintetica.com.br], copia: [yuritoso@sogamax.com.br], canais: [email]}
   # ------------------------------------------------------------------------------------
 
   # DESATIVADO em 15/09/2026: fora da docs/referencia/ENVIO MAPA.xlsx. Mantido no arquivo, como a
@@ -113,13 +113,13 @@ fabricantes:
       - 10972               # A.PHARMA DISTRIBUIDORA LTDA- (SERRA - ES)
     ativo: false
     comprador: *yuri
-    contatos: {emails: [fjunior4@br.aspenpharma.com], copia: [pedro@sogamax.com.br, yuritoso@sogamax.com.br], canais: [email]}
+    contatos: {emails: [fjunior4@br.aspenpharma.com], copia: [yuritoso@sogamax.com.br], canais: [email]}
 
   - nome: BIOPAS
     codigo: 106499          # BIOPAS BRASIL PRODUTOS FARMACEUTICOS
     dias_semana: [segunda]
     comprador: *yuri
-    contatos: {emails: [Gustavo.Barbosa@swixxbiopharma.com], copia: [pedro@sogamax.com.br, yuritoso@sogamax.com.br], canais: [email]}
+    contatos: {emails: [Gustavo.Barbosa@swixxbiopharma.com], copia: [yuritoso@sogamax.com.br], canais: [email]}
 
   # Linhas 6 e 7 da ENVIO MAPA.xlsx: mesmo nome, codigos diferentes, sem " - " unindo.
   # Sao dois relatorios separados, para o mesmo contato. Os dois codigos foram conferidos
@@ -129,25 +129,25 @@ fabricantes:
     codigo: 122992          # CELLERA - CONSUMO - ( SERRA - ES)
     dias_semana: [segunda]
     comprador: *yuri
-    contatos: {emails: [leonardo.souza@cellerafarma.com.br], copia: [pedro@sogamax.com.br, yuritoso@sogamax.com.br], canais: [email]}
+    contatos: {emails: [leonardo.souza@cellerafarma.com.br], copia: [yuritoso@sogamax.com.br], canais: [email]}
 
   - nome: CELLERA_FARMACEUTICA
     codigo: 123174          # CELLERA FARMACEUTICA ( SERRA - ES)
     dias_semana: [segunda]
     comprador: *yuri
-    contatos: {emails: [leonardo.souza@cellerafarma.com.br], copia: [pedro@sogamax.com.br, yuritoso@sogamax.com.br], canais: [email]}
+    contatos: {emails: [leonardo.souza@cellerafarma.com.br], copia: [yuritoso@sogamax.com.br], canais: [email]}
 
   - nome: DIFFUCAP
     codigo: 7142            # DIFFUCAP-CHEMOBRAS - (QUINTINO BOCAIUVA - RJ)
     dias_semana: [segunda]
     comprador: *yuri
-    contatos: {emails: [ethieny.araujo@diffucap.com.br], copia: [pedro@sogamax.com.br, yuritoso@sogamax.com.br], canais: [email]}
+    contatos: {emails: [ethieny.araujo@diffucap.com.br], copia: [yuritoso@sogamax.com.br], canais: [email]}
 
   - nome: DIVCOM_RX
     codigo: 22999           # FARMOQUIMICA (RX - CAMPINA GRANDE - PB)
     dias_semana: [segunda]
     comprador: *yuri
-    contatos: {emails: [mapaulo@fqm.com.br], copia: [pedro@sogamax.com.br, yuritoso@sogamax.com.br], canais: [email]}
+    contatos: {emails: [mapaulo@fqm.com.br], copia: [yuritoso@sogamax.com.br], canais: [email]}
 
   # Linhas 8 e 9 da planilha: mesmo nome, codigos diferentes, sem " - " unindo.
   # Sao dois relatorios separados; o sufixo e a unidade, para as pastas nao colidirem.
@@ -157,14 +157,14 @@ fabricantes:
     dias_semana: [segunda]
     # eduardo.lucena@underskin.com.br atende 4 laboratorios deste grupo economico
     comprador: *yuri
-    contatos: {emails: [eduardo.lucena@underskin.com.br], copia: [pedro@sogamax.com.br, yuritoso@sogamax.com.br], canais: [email]}
+    contatos: {emails: [eduardo.lucena@underskin.com.br], copia: [yuritoso@sogamax.com.br], canais: [email]}
 
   - nome: EMS_BRACE_PHARMA_EXTREMA
     codigo: 61724           # BRACE PHARMA - (EXTREMA- MG)
     dias_semana: [segunda]
     # eduardo.lucena@underskin.com.br atende 4 laboratorios deste grupo economico
     comprador: *yuri
-    contatos: {emails: [eduardo.lucena@underskin.com.br], copia: [pedro@sogamax.com.br, yuritoso@sogamax.com.br], canais: [email]}
+    contatos: {emails: [eduardo.lucena@underskin.com.br], copia: [yuritoso@sogamax.com.br], canais: [email]}
 
   # A planilha trazia 46423, que nao existe no Geweb; Pedro corrigiu para 46239 em 03/08/2026.
 
@@ -173,7 +173,7 @@ fabricantes:
     dias_semana: [segunda]
     # roberto.mattos@ems.com.br atende 2 laboratorios deste grupo economico
     comprador: *yuri
-    contatos: {emails: [roberto.mattos@ems.com.br], copia: [pedro@sogamax.com.br, yuritoso@sogamax.com.br], canais: [email]}
+    contatos: {emails: [roberto.mattos@ems.com.br], copia: [yuritoso@sogamax.com.br], canais: [email]}
 
   # ATENCAO: no Geweb o codigo 14232 se chama MOMENTA FARMACEUTICA (empresa do grupo
   # Eurofarma), nao "EUROFARMA LABORATORIOS S.A." como esta na planilha. Confirme.
@@ -182,20 +182,20 @@ fabricantes:
     codigo: 14232           # MOMENTA FARMACEUTICA
     dias_semana: [segunda]
     comprador: *yuri
-    contatos: {emails: [janderson.venturin@momentafarma.com.br], copia: [pedro@sogamax.com.br, yuritoso@sogamax.com.br], canais: [email]}
+    contatos: {emails: [janderson.venturin@momentafarma.com.br], copia: [yuritoso@sogamax.com.br], canais: [email]}
 
   - nome: EUROFARMA_RX
     codigo: 13963           # EUROFARMA LABORATORIOS (RX)  — conferido contra o mapa manual
     dias_semana: [segunda, quarta]
     comprador: *yuri
-    contatos: {emails: [pedro.silva@eurofarma.com], copia: [pedro@sogamax.com.br, yuritoso@sogamax.com.br], canais: [email]}
+    contatos: {emails: [pedro.silva@eurofarma.com], copia: [yuritoso@sogamax.com.br], canais: [email]}
 
   - nome: GERMED
     codigo: 5660            # GERMED (RX - HORTOLÂNDIA - SP)
     dias_semana: [segunda]
     # eduardo.lucena@underskin.com.br atende 4 laboratorios deste grupo economico
     comprador: *yuri
-    contatos: {emails: [eduardo.lucena@underskin.com.br], copia: [pedro@sogamax.com.br, yuritoso@sogamax.com.br], canais: [email]}
+    contatos: {emails: [eduardo.lucena@underskin.com.br], copia: [yuritoso@sogamax.com.br], canais: [email]}
 
   # A ENVIO MAPA.xlsx traz "kirian.cunha@herbamned.com.br" — "herbamned" e erro de digitacao:
   # a planilha anterior e o proprio nome do laboratorio dizem herbamed.com.br. Mantido.
@@ -203,20 +203,20 @@ fabricantes:
     codigo: 40333           # HERBAMED
     dias_semana: [segunda]
     comprador: *yuri
-    contatos: {emails: [kirian.cunha@herbamed.com.br], copia: [pedro@sogamax.com.br, yuritoso@sogamax.com.br], canais: [email]}
+    contatos: {emails: [kirian.cunha@herbamed.com.br], copia: [yuritoso@sogamax.com.br], canais: [email]}
 
   - nome: KLEY_HERTZ
     codigo: 30314           # KLEY HERTZ DISTRIBUIDORA LTDA
     dias_semana: [segunda]
     comprador: *yuri
-    contatos: {emails: [mfigueiredo@hertzfarma.com.br], copia: [pedro@sogamax.com.br, yuritoso@sogamax.com.br], canais: [email]}
+    contatos: {emails: [mfigueiredo@hertzfarma.com.br], copia: [yuritoso@sogamax.com.br], canais: [email]}
 
   - nome: LAFIMAN
     codigo: 39010           # LAFIMAN DISTRIBUIDORA DE MEDICAMENTOS LTDA
     dias_semana: [segunda]
     # roberto.mattos@ems.com.br atende 2 laboratorios deste grupo economico
     comprador: *yuri
-    contatos: {emails: [roberto.mattos@ems.com.br], copia: [pedro@sogamax.com.br, yuritoso@sogamax.com.br], canais: [email]}
+    contatos: {emails: [roberto.mattos@ems.com.br], copia: [yuritoso@sogamax.com.br], canais: [email]}
 
   # ATENCAO: no Geweb o codigo 44425 se chama OFTA VISION HEALTH, nao "LEGRAND PHARMA".
   # Os LEGRAND ativos no Geweb sao 51079/104752/104753/104754 (LEGRAND GENÉRICO). Confirme.
@@ -226,7 +226,7 @@ fabricantes:
     dias_semana: [segunda]
     # eduardo.lucena@underskin.com.br atende 4 laboratorios deste grupo economico
     comprador: *yuri
-    contatos: {emails: [eduardo.lucena@underskin.com.br], copia: [pedro@sogamax.com.br, yuritoso@sogamax.com.br], canais: [email]}
+    contatos: {emails: [eduardo.lucena@underskin.com.br], copia: [yuritoso@sogamax.com.br], canais: [email]}
 
   # Incluido em 23/10/2026 (ENVIO MAPA.xlsx). No Geweb o 61596 e um codigo OTC da EMS.
   # roberto.mattos@ems.com.br passa a receber 3 mapas: EMS_RX, LAFIMAN e este.
@@ -234,31 +234,31 @@ fabricantes:
     codigo: 61596           # EMS (OTC - TANQUINHO VELHO - SP)
     dias_semana: [segunda]
     comprador: *yuri
-    contatos: {emails: [roberto.mattos@ems.com.br], copia: [pedro@sogamax.com.br, yuritoso@sogamax.com.br], canais: [email]}
+    contatos: {emails: [roberto.mattos@ems.com.br], copia: [yuritoso@sogamax.com.br], canais: [email]}
 
   - nome: MARJAN
     codigo: 7127            # MARJAN INDÚSTRIA E COMÉRCIO LTDA
     dias_semana: [segunda, quarta]
     comprador: *yuri
-    contatos: {emails: [nr.nelson@marjanfarma.com.br], copia: [pedro@sogamax.com.br, yuritoso@sogamax.com.br], canais: [email]}
+    contatos: {emails: [nr.nelson@marjanfarma.com.br], copia: [yuritoso@sogamax.com.br], canais: [email]}
 
   - nome: MEDQUIMICA
     codigo: 47658           # MEDQUIMICA INDUSTRIA FARMACEUTICA
     dias_semana: [segunda]
     comprador: *yuri
-    contatos: {emails: [thiagodomingues@lupin.com], copia: [pedro@sogamax.com.br, yuritoso@sogamax.com.br], canais: [email]}
+    contatos: {emails: [thiagodomingues@lupin.com], copia: [yuritoso@sogamax.com.br], canais: [email]}
 
   - nome: MYRALIS
     codigo: 104634          # MYRALIS INDÚSTRIA FARMACÊUTICA
     dias_semana: [segunda]
     comprador: *yuri
-    contatos: {emails: [elaine.silva@myralis.com.br], copia: [pedro@sogamax.com.br, yuritoso@sogamax.com.br], canais: [email]}
+    contatos: {emails: [elaine.silva@myralis.com.br], copia: [yuritoso@sogamax.com.br], canais: [email]}
 
   - nome: ORGANON
     codigo: 52878           # ORGANON FARMACEUTICA LTDA.
     dias_semana: [segunda]
     comprador: *yuri
-    contatos: {emails: [paulo.sakakura@organon.com], copia: [pedro@sogamax.com.br, yuritoso@sogamax.com.br], canais: [email]}
+    contatos: {emails: [paulo.sakakura@organon.com], copia: [yuritoso@sogamax.com.br], canais: [email]}
 
   # DESATIVADO em 27/08/2026: parceria encerrada (Pedro). Mantido no arquivo de proposito —
   # `ativo: false` desliga a extracao e o envio, e reativar e trocar por `true`. Os relatorios
@@ -269,13 +269,13 @@ fabricantes:
     ativo: false
     dias_semana: [segunda, quinta]
     comprador: *yuri
-    contatos: {emails: [comercial.farma@sanofi.com], copia: [pedro@sogamax.com.br, yuritoso@sogamax.com.br], canais: [email]}
+    contatos: {emails: [comercial.farma@sanofi.com], copia: [yuritoso@sogamax.com.br], canais: [email]}
 
   - nome: SUPERA_RX
     codigo: 58650           # SUPERA RX
     dias_semana: [segunda]
     comprador: *yuri
-    contatos: {emails: [leandro.braga@superarx.com.br], copia: [pedro@sogamax.com.br, yuritoso@sogamax.com.br], canais: [email]}
+    contatos: {emails: [leandro.braga@superarx.com.br], copia: [yuritoso@sogamax.com.br], canais: [email]}
 
   - nome: TORRENT
     codigos:
@@ -283,13 +283,13 @@ fabricantes:
       - 54843               # TORRENT DO BRASIL LTDA (RX)
     dias_semana: [segunda]
     comprador: *yuri
-    contatos: {emails: [renato@torrent.com.br], copia: [pedro@sogamax.com.br, yuritoso@sogamax.com.br], canais: [email]}
+    contatos: {emails: [renato@torrent.com.br], copia: [yuritoso@sogamax.com.br], canais: [email]}
 
   - nome: VIATRIS
     codigo: 46292           # VIATRIS FARMACEUTICA (GUARULHOS - SP)
     dias_semana: [segunda]
     comprador: *yuri
-    contatos: {emails: [Antonio.Barbara@viatris.com], copia: [pedro@sogamax.com.br, yuritoso@sogamax.com.br], canais: [email]}
+    contatos: {emails: [Antonio.Barbara@viatris.com], copia: [yuritoso@sogamax.com.br], canais: [email]}
 
   # =====================================================================================
   # CARTEIRA DE MIKELY TAMY (16/09/2026) — de docs/referencia/ENVIO MAPA.xlsx, coluna COMPRADOR.
@@ -305,20 +305,20 @@ fabricantes:
       cargo: Compras
       telefones: 0800 022 1210 / (22) 2785-2614 / (22) 99944-1920
       responder_para: mikely@sogamax.com.br
-    contatos: {emails: [mateus.marques@baruel.com.br], copia: [pedro@sogamax.com.br, mikely@sogamax.com.br], canais: [email]}
+    contatos: {emails: [mateus.marques@baruel.com.br], copia: [mikely@sogamax.com.br], canais: [email]}
 
   - nome: CREMER
     codigo: 7485            # CREMER S.A. - (INDAIL - SC)
     dias_semana: [segunda]
     comprador: *mikely
-    contatos: {emails: [mateus.lourinho@cremer.com.br], copia: [pedro@sogamax.com.br, mikely@sogamax.com.br], canais: [email]}
+    contatos: {emails: [mateus.lourinho@cremer.com.br], copia: [mikely@sogamax.com.br], canais: [email]}
 
   # Contato e Gmail de representante, nao caixa corporativa — confirmado com a Mikely.
   - nome: OMRON
     codigo: 43176           # OMRON HEALTHCARE
     dias_semana: [segunda]
     comprador: *mikely
-    contatos: {emails: [anacosta.rep@gmail.com], copia: [pedro@sogamax.com.br, mikely@sogamax.com.br], canais: [email]}
+    contatos: {emails: [anacosta.rep@gmail.com], copia: [mikely@sogamax.com.br], canais: [email]}
 
   # =====================================================================================
   # CARTEIRA DE JOICI RANGEL (16/09/2026).
@@ -333,19 +333,19 @@ fabricantes:
       cargo: Compras
       telefones: 0800 022 1210 / (22) 2785-2614 / (22) 99758-1505
       responder_para: joici@sogamax.com.br
-    contatos: {emails: [mauricio.ramos@abbott.com], copia: [pedro@sogamax.com.br, joici@sogamax.com.br], canais: [email]}
+    contatos: {emails: [mauricio.ramos@abbott.com], copia: [joici@sogamax.com.br], canais: [email]}
 
   - nome: BAYER_OTC
     codigo: 22866           # BAYER S.A. (BARUERI CECI II)
     dias_semana: [segunda]
     comprador: *joici
-    contatos: {emails: [chafic.publo@terra.com.br], copia: [pedro@sogamax.com.br, joici@sogamax.com.br], canais: [email]}
+    contatos: {emails: [chafic.publo@terra.com.br], copia: [joici@sogamax.com.br], canais: [email]}
 
   - nome: CIFARMA
     codigo: 49913           # CIFARMA CIENTIFICA FARMACEUTICA
     dias_semana: [segunda]
     comprador: *joici
-    contatos: {emails: [gleyson@cifarma.com.br], copia: [pedro@sogamax.com.br, joici@sogamax.com.br], canais: [email]}
+    contatos: {emails: [gleyson@cifarma.com.br], copia: [joici@sogamax.com.br], canais: [email]}
 
   # Na planilha os dois codigos vem unidos: UM relatorio so. O 7149 e LATINOFARMA no Geweb.
   - nome: CRISTALIA
@@ -354,19 +354,19 @@ fabricantes:
       - 7149                # LATINOFARMA PRODUTOS FARMACEUTICOS
     dias_semana: [segunda]
     comprador: *joici
-    contatos: {emails: [herbert.domingues@cristalia.com.br], copia: [pedro@sogamax.com.br, joici@sogamax.com.br], canais: [email]}
+    contatos: {emails: [herbert.domingues@cristalia.com.br], copia: [joici@sogamax.com.br], canais: [email]}
 
   - nome: EUROFARMA_OTC
     codigo: 45484           # EUROFARMA LABORATORIOS - OTC - (VARGINHA - MG
     dias_semana: [segunda]
     comprador: *joici
-    contatos: {emails: [andrea.vasconcellos@eurofarma.com], copia: [pedro@sogamax.com.br, joici@sogamax.com.br], canais: [email]}
+    contatos: {emails: [andrea.vasconcellos@eurofarma.com], copia: [joici@sogamax.com.br], canais: [email]}
 
   - nome: LEBON
     codigo: 47476           # LEBON FARMA
     dias_semana: [segunda]
     comprador: *joici
-    contatos: {emails: [jprata42@gmail.com], copia: [pedro@sogamax.com.br, joici@sogamax.com.br], canais: [email]}
+    contatos: {emails: [jprata42@gmail.com], copia: [joici@sogamax.com.br], canais: [email]}
 
   # Incluido em 23/10/2026 (ENVIO MAPA.xlsx), no lugar da EMS_OTC de 19/10: os codigos
   # 47228 e 58532 passam para ca, somados ao 44421, num relatorio so.
@@ -378,20 +378,20 @@ fabricantes:
       - 47228               # EMS - OTC - (CHACARA ASSAY - SP)
     dias_semana: [segunda]
     comprador: *joici
-    contatos: {emails: [claudio.mendonca@legrandpharma.com.br], copia: [pedro@sogamax.com.br, joici@sogamax.com.br], canais: [email]}
+    contatos: {emails: [claudio.mendonca@legrandpharma.com.br], copia: [joici@sogamax.com.br], canais: [email]}
 
   # Mesmo contato do MERCK_GENERICOS (Geliana): ele recebe DOIS mapas, de compradores diferentes.
   - nome: MERCK_RX
     codigo: 27878           # MERCK - RX - ( RIO DE JANEIRO - RJ)
     dias_semana: [segunda]
     comprador: *joici
-    contatos: {emails: [davi.bertolini@merckgroup.com], copia: [pedro@sogamax.com.br, joici@sogamax.com.br], canais: [email]}
+    contatos: {emails: [davi.bertolini@merckgroup.com], copia: [joici@sogamax.com.br], canais: [email]}
 
   - nome: MULTISAUDE
     codigo: 107151          # MULTISAUDE FARMACEUTICA
     dias_semana: [segunda]
     comprador: *joici
-    contatos: {emails: [gcmg@wplab.ind.br], copia: [pedro@sogamax.com.br, joici@sogamax.com.br], canais: [email]}
+    contatos: {emails: [gcmg@wplab.ind.br], copia: [joici@sogamax.com.br], canais: [email]}
 
   # =====================================================================================
   # CARTEIRA DE GELIANA FERREIRA (16/09/2026).
@@ -408,19 +408,19 @@ fabricantes:
       cargo: Compras
       telefones: 0800 022 1210 / (22) 2785-2614 / (22) 99269-6182
       responder_para: geliana@sogamax.com.br
-    contatos: {emails: [jana.romano@blau.com], copia: [pedro@sogamax.com.br, geliana@sogamax.com.br], canais: [email]}
+    contatos: {emails: [jana.romano@blau.com], copia: [geliana@sogamax.com.br], canais: [email]}
 
   - nome: BLAU
     codigo: 35729           # BLAU - (COTIA-SP)
     dias_semana: [segunda]
     comprador: *geliana
-    contatos: {emails: [jana.romano@blau.com], copia: [pedro@sogamax.com.br, geliana@sogamax.com.br], canais: [email]}
+    contatos: {emails: [jana.romano@blau.com], copia: [geliana@sogamax.com.br], canais: [email]}
 
   - nome: CATARINENSE
     codigo: 20285           # LABORATORIO CATARINENSE
     dias_semana: [segunda]
     comprador: *geliana
-    contatos: {emails: [marilene.eduardo@catarinensepharma.com.br], copia: [pedro@sogamax.com.br, geliana@sogamax.com.br], canais: [email]}
+    contatos: {emails: [marilene.eduardo@catarinensepharma.com.br], copia: [geliana@sogamax.com.br], canais: [email]}
 
   # Quarta entrada EUROFARMA do cadastro (com _RX, _OTC e a EUROFARMA/Momenta do Yuri).
   - nome: EUROFARMA_GENERICOS
@@ -430,13 +430,13 @@ fabricantes:
       - 45483               # EUROFARMA (GENERICO - CD VARGINHA - MG)
     dias_semana: [segunda]
     comprador: *geliana
-    contatos: {emails: [Hugo.Queiroz@eurofarma.com], copia: [pedro@sogamax.com.br, geliana@sogamax.com.br], canais: [email]}
+    contatos: {emails: [Hugo.Queiroz@eurofarma.com], copia: [geliana@sogamax.com.br], canais: [email]}
 
   - nome: FLORA_NECTAR
     codigo: 19117           # FLORA NECTAR INDUSTRIA COMERCIO IMPORTACAO E
     dias_semana: [segunda]
     comprador: *geliana
-    contatos: {emails: [edivaldorodrigues1972@gmail.com], copia: [pedro@sogamax.com.br, geliana@sogamax.com.br], canais: [email]}
+    contatos: {emails: [edivaldorodrigues1972@gmail.com], copia: [geliana@sogamax.com.br], canais: [email]}
 
   # O 50640 saiu em 16/09/2026: e um agente GERMED, nao um fornecedor, e o campo Fabricante
   # do relatorio nao o oferece — a extracao falhava com timeout esperando a opcao "(50640)".
@@ -446,7 +446,7 @@ fabricantes:
       - 50655               # GERMED GENERICO - (HORTOLÂNDIA - SP)
     dias_semana: [segunda]
     comprador: *geliana
-    contatos: {emails: [marina.vidal@gruponc.net.br], copia: [pedro@sogamax.com.br, geliana@sogamax.com.br], canais: [email]}
+    contatos: {emails: [marina.vidal@gruponc.net.br], copia: [geliana@sogamax.com.br], canais: [email]}
 
   - nome: LEGRAND_GENERICO
     codigos:
@@ -456,13 +456,13 @@ fabricantes:
       - 104754              # LEGRAND GENÉRICO
     dias_semana: [segunda]
     comprador: *geliana
-    contatos: {emails: [Ygor.barge@legrandpharma.com.br], copia: [pedro@sogamax.com.br, geliana@sogamax.com.br], canais: [email]}
+    contatos: {emails: [Ygor.barge@legrandpharma.com.br], copia: [geliana@sogamax.com.br], canais: [email]}
 
   - nome: MEDIFLORA
     codigo: 22287           # PROFIGADO PRONOVERBI PRODUTOS MEDIFLORA LTDA
     dias_semana: [segunda]
     comprador: *geliana
-    contatos: {emails: [naturezadaserrapetr@gmail.com], copia: [pedro@sogamax.com.br, geliana@sogamax.com.br], canais: [email]}
+    contatos: {emails: [naturezadaserrapetr@gmail.com], copia: [geliana@sogamax.com.br], canais: [email]}
 
   # Nao confundir com SANOFI_MEDLEY (desativada, carteira do Yuri).
   - nome: MEDLEY_GENERICOS
@@ -471,13 +471,13 @@ fabricantes:
       - 112489              # MEDLEY FARMACEUTICA - ( CAMPINAS - SP)
     dias_semana: [quarta]   # era segunda; mudou para quarta em 29/09/2026
     comprador: *geliana
-    contatos: {emails: [Alexandre.Lopes@medley.com.br], copia: [pedro@sogamax.com.br, geliana@sogamax.com.br], canais: [email]}
+    contatos: {emails: [Alexandre.Lopes@medley.com.br], copia: [geliana@sogamax.com.br], canais: [email]}
 
   - nome: MERCK_GENERICOS
     codigo: 27499           # MERCK GENERICO - (RIO DE JANEIRO - RJ)
     dias_semana: [segunda]
     comprador: *geliana
-    contatos: {emails: [davi.bertolini@merckgroup.com], copia: [pedro@sogamax.com.br, geliana@sogamax.com.br], canais: [email]}
+    contatos: {emails: [davi.bertolini@merckgroup.com], copia: [geliana@sogamax.com.br], canais: [email]}
 
   - nome: NOVA_QUIMICA
     codigos:
@@ -487,4 +487,4 @@ fabricantes:
       - 50756               # NOVA QUÍMICA - GENÉRICO - (EXTREMA - MG)
     dias_semana: [segunda]
     comprador: *geliana
-    contatos: {emails: [renan.santos@novaquimicagenericos.com.br], copia: [pedro@sogamax.com.br, geliana@sogamax.com.br], canais: [email]}
+    contatos: {emails: [renan.santos@novaquimicagenericos.com.br], copia: [geliana@sogamax.com.br], canais: [email]}
