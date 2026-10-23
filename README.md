@@ -10,8 +10,8 @@ Quarenta e seis vezes por semana, entre quatro compradores.
 | | |
 |---|---|
 | **Situação** | Em homologação: extração em produção, envio real travado pelo `DESTINATARIO_TESTE` |
-| **Laboratórios** | 47 ativos, em 4 carteiras de compradores (outubro/2026) |
-| **Rodada mais pesada** | segunda-feira: 46 relatórios em ~3min40 |
+| **Laboratórios** | 48 ativos, em 4 carteiras de compradores (outubro/2026) |
+| **Rodada mais pesada** | segunda-feira: 47 relatórios em ~3min40 |
 | **Canais** | e-mail (em uso) e WhatsApp (implementado, sem provedor contratado) |
 | **Responsável técnico** | Pedro Veloso ([pedro@sogamax.com.br](mailto:pedro@sogamax.com.br)) |
 

@@ -3,6 +3,17 @@
 Mudanças relevantes para quem opera ou mantém o Mapa de Estoque, da mais recente para a mais
 antiga. O detalhe de cada uma está no histórico do git.
 
+## 2026-10-23
+
+- Entraram as duas LUXBIOTECH da `ENVIO MAPA.xlsx`, semanal de segunda e mensal:
+  LUXBIOTECH (61596, carteira do Yuri, para roberto.mattos@ems.com.br) e
+  LUXBIOTECH_EMS_HPC (44421, 58532 e 47228 num relatório só, carteira da Joici, para
+  claudio.mendonca@legrandpharma.com.br). A EMS_OTC saiu: os códigos dela passaram para a
+  LUXBIOTECH_EMS_HPC. Nenhuma das duas recebe o mensal de setembro.
+- São 48 laboratórios ativos; a segunda passa a 47 semanais, e o pior caso (mensal atrasado
+  recuperado numa segunda) a 95. A cota por hora (`MAX_ENVIOS_POR_HORA`) passou de 93 para
+  95. Com os 2 e-mails da revisão são 97 dos 100 por hora que a Locaweb aceita na caixa.
+
 ## 2026-10-19
 
 - Entrou a EMS_OTC (códigos 47228 e 58532, num relatório só), na carteira da Joici: semanal

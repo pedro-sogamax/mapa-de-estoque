@@ -228,6 +228,14 @@ fabricantes:
     comprador: *yuri
     contatos: {emails: [eduardo.lucena@underskin.com.br], copia: [pedro@sogamax.com.br, yuritoso@sogamax.com.br], canais: [email]}
 
+  # Incluido em 23/10/2026 (ENVIO MAPA.xlsx). No Geweb o 61596 e um codigo OTC da EMS.
+  # roberto.mattos@ems.com.br passa a receber 3 mapas: EMS_RX, LAFIMAN e este.
+  - nome: LUXBIOTECH
+    codigo: 61596           # EMS (OTC - TANQUINHO VELHO - SP)
+    dias_semana: [segunda]
+    comprador: *yuri
+    contatos: {emails: [roberto.mattos@ems.com.br], copia: [pedro@sogamax.com.br, yuritoso@sogamax.com.br], canais: [email]}
+
   - nome: MARJAN
     codigo: 7127            # MARJAN INDÚSTRIA E COMÉRCIO LTDA
     dias_semana: [segunda, quarta]
@@ -348,16 +356,6 @@ fabricantes:
     comprador: *joici
     contatos: {emails: [herbert.domingues@cristalia.com.br], copia: [pedro@sogamax.com.br, joici@sogamax.com.br], canais: [email]}
 
-  # Incluido em 19/10/2026: os dois codigos OTC da EMS somados num relatorio so.
-  # O contato nao e o roberto.mattos@, que recebe a EMS_RX e a LAFIMAN (carteira do Yuri).
-  - nome: EMS_OTC
-    codigos:
-      - 47228               # EMS - OTC - (CHACARA ASSAY - SP)
-      - 58532               # EMS OTC - (EXTREMA - MG)
-    dias_semana: [segunda]
-    comprador: *joici
-    contatos: {emails: [tainah.souza@grupoems.com], copia: [pedro@sogamax.com.br, joici@sogamax.com.br], canais: [email]}
-
   - nome: EUROFARMA_OTC
     codigo: 45484           # EUROFARMA LABORATORIOS - OTC - (VARGINHA - MG
     dias_semana: [segunda]
@@ -369,6 +367,18 @@ fabricantes:
     dias_semana: [segunda]
     comprador: *joici
     contatos: {emails: [jprata42@gmail.com], copia: [pedro@sogamax.com.br, joici@sogamax.com.br], canais: [email]}
+
+  # Incluido em 23/10/2026 (ENVIO MAPA.xlsx), no lugar da EMS_OTC de 19/10: os codigos
+  # 47228 e 58532 passam para ca, somados ao 44421, num relatorio so.
+  # A planilha traz "44421 - 5853 -47228": o 5853 nao existe no Geweb e foi lido como 58532.
+  - nome: LUXBIOTECH_EMS_HPC
+    codigos:
+      - 44421               # EMS - (HPC TANQUINHO VELHO - SP)
+      - 58532               # EMS OTC - (EXTREMA - MG)
+      - 47228               # EMS - OTC - (CHACARA ASSAY - SP)
+    dias_semana: [segunda]
+    comprador: *joici
+    contatos: {emails: [claudio.mendonca@legrandpharma.com.br], copia: [pedro@sogamax.com.br, joici@sogamax.com.br], canais: [email]}
 
   # Mesmo contato do MERCK_GENERICOS (Geliana): ele recebe DOIS mapas, de compradores diferentes.
   - nome: MERCK_RX
