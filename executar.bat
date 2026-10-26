@@ -11,8 +11,10 @@ REM Codigos de saida:
 REM   0  tudo certo          2  erro de configuracao
 REM   1  extracao falhou     3  extraiu, mas algum e-mail nao foi entregue
 REM
-REM Configuracao da tarefa agendada (o caminho tem espacos e acento — mantenha as aspas):
-REM   Programa/script : "C:\Users\pedro.veloso\Documents\Desenvolvimento - Interno\mapa-de-estoque\executar.bat"
+REM A tarefa agendada NAO chama este arquivo direto: chama o executar-oculto.vbs, que o roda
+REM sem janela (uma janela de cmd aberta foi fechada no meio da rodada de 26/10/2026).
+REM   Programa/script : wscript.exe
+REM   Argumentos      : "C:\Users\pedro.veloso\Documents\Desenvolvimento - Interno\mapa-de-estoque\executar-oculto.vbs"
 REM   Iniciar em      : "C:\Users\pedro.veloso\Documents\Desenvolvimento - Interno\mapa-de-estoque"
 REM
 REM Para conferir o que esta agendado de verdade:

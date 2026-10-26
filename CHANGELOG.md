@@ -3,6 +3,12 @@
 Mudanças relevantes para quem opera ou mantém o Mapa de Estoque, da mais recente para a mais
 antiga. O detalhe de cada uma está no histórico do git.
 
+## 2026-10-26
+
+- A tarefa agendada roda sem janela, pelo novo `executar-oculto.vbs`. Na primeira rodada real,
+  a janela do cmd foi fechada no meio da extração e nada foi enviado; os 47 mapas da semana
+  saíram à mão no mesmo dia.
+
 ## 2026-10-23
 
 - **Envio real às indústrias a partir de 26/10/2026**, pela tarefa agendada às 08:30 nos dias

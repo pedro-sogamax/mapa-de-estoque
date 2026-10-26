@@ -13,7 +13,10 @@ periodicidade.
 
 ## O que a tarefa roda
 
-A tarefa chama o [executar.bat](../executar.bat), que:
+A tarefa chama o `wscript.exe` com o [executar-oculto.vbs](../executar-oculto.vbs), que roda o
+[executar.bat](../executar.bat) **sem janela**. Com a janela do cmd visível, a rodada de
+26/10/2026 morreu no meio da extração: quem estava na máquina viu uma tela preta parada e a
+fechou. O `executar.bat`:
 
 1. entra na pasta do projeto (`cd /d "%~dp0"`), então não depende do campo *"Iniciar em"*;
 2. roda `src.main --headless --enviar`: extrai sem janela e, no fim, envia os e-mails;
@@ -50,7 +53,7 @@ aspas, porque o caminho pode ter espaços e acentos:
 
 ```powershell
 $raiz = "C:\caminho\para\mapa-de-estoque"
-$acao = New-ScheduledTaskAction -Execute (Join-Path $raiz "executar.bat") -WorkingDirectory $raiz
+$acao = New-ScheduledTaskAction -Execute "wscript.exe" -Argument "`"$raiz\executar-oculto.vbs`"" -WorkingDirectory $raiz
 $gatilho = New-ScheduledTaskTrigger -Weekly -DaysOfWeek Monday,Tuesday,Wednesday,Thursday,Friday -At 8:30am
 $config = New-ScheduledTaskSettingsSet -StartWhenAvailable -DontStopIfGoingOnBatteries -AllowStartIfOnBatteries
 Register-ScheduledTask -TaskName "Mapa de Estoque - Geweb" -Action $acao -Trigger $gatilho -Settings $config -Force
