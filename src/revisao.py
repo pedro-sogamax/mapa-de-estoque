@@ -164,18 +164,40 @@ def eventos_da_semana(eventos: list[dict[str, Any]], inicio: date, fim: date) ->
     return [e for e in eventos if de <= str(e.get("em", ""))[:10] <= ate]
 
 
+def _chave(evento: dict[str, Any]) -> tuple[str, str, str]:
+    return (str(evento.get("tipo", "")), str(evento.get("laboratorio", "")), str(evento.get("periodo", "")))
+
+
+def _ultimos(eventos: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    """Um evento por etapa, laboratorio e periodo: o mais recente, que e o desfecho.
+
+    Uma falha seguida de nova tentativa bem-sucedida conta como ok. Contar cada tentativa
+    fazia um envio repetido a mao aparecer como falha e inflar o total.
+    """
+    ultimo: dict[tuple[str, str, str], dict[str, Any]] = {}
+    for evento in sorted(eventos, key=lambda e: str(e.get("em", ""))):
+        ultimo[_chave(evento)] = evento
+    return list(ultimo.values())
+
+
 def _contagem(eventos: list[dict[str, Any]], tipo: str) -> dict[str, int]:
     conta: dict[str, int] = {}
-    for evento in eventos:
+    for evento in _ultimos(eventos):
         if evento.get("tipo") == tipo:
             resultado = str(evento.get("resultado", ""))
             conta[resultado] = conta.get(resultado, 0) + 1
     return conta
 
 
-def _pendencias(eventos: list[dict[str, Any]]) -> list[str]:
-    """O que falhou ou nem foi tentado, na ordem em que aconteceu."""
-    linhas = []
+def _pendencias(eventos: list[dict[str, Any]]) -> tuple[list[str], list[str]]:
+    """(em aberto, resolvidas): o que falhou ou nem foi tentado, na ordem em que aconteceu.
+
+    Resolvida e a falha que, mais tarde na semana, deu certo para o mesmo laboratorio,
+    periodo e etapa. Ela continua no texto, para a revisora saber que houve tropeco, mas
+    nao conta como pendencia.
+    """
+    desfecho = {_chave(e): e for e in _ultimos(eventos)}
+    abertas, resolvidas = [], []
     for evento in sorted(eventos, key=lambda e: str(e.get("em", ""))):
         tipo, resultado = evento.get("tipo"), evento.get("resultado")
         if resultado not in ("falha", "nao tentado"):
@@ -183,12 +205,18 @@ def _pendencias(eventos: list[dict[str, Any]]) -> list[str]:
         em = str(evento.get("em", ""))
         etapa = "extração" if tipo == "extracao" else "envio"
         marca = " [não tentado]" if resultado == "nao tentado" else ""
-        linhas.append(
+        linha = (
             f"  - {em[8:10]}/{em[5:7]} {etapa:<8} {evento.get('laboratorio', '')} "
             f"({evento.get('periodo', '')}): {evento.get('motivo', '') or 'sem motivo registrado'}"
             f"{marca}"
         )
-    return linhas
+        final = desfecho[_chave(evento)]
+        if final.get("resultado") in ("falha", "nao tentado"):
+            abertas.append(linha)
+        else:
+            depois = str(final.get("em", ""))
+            resolvidas.append(f"{linha} — resolvida em {depois[8:10]}/{depois[5:7]} {depois[11:16]}")
+    return abertas, resolvidas
 
 
 def montar_relatorio(
@@ -201,7 +229,7 @@ def montar_relatorio(
     """(assunto, corpo) do relatorio da semana. Texto puro: e o que a revisora le."""
     extracoes = _contagem(eventos, "extracao")
     envios = _contagem(eventos, "envio")
-    pendencias = _pendencias(eventos)
+    pendencias, resolvidas = _pendencias(eventos)
 
     assunto = f"[Mapa de Estoque] Revisão semanal — {inicio:%d/%m} a {fim:%d/%m/%Y}"
     if pendencias or erro_da_rodada:
@@ -229,8 +257,15 @@ def montar_relatorio(
             linhas += pendencias[:MAX_PENDENCIAS]
             if len(pendencias) > MAX_PENDENCIAS:
                 linhas.append(f"  ... e mais {len(pendencias) - MAX_PENDENCIAS} — veja a planilha anexa.")
-        else:
+        elif not resolvidas:
             linhas.append("Nenhuma falha na semana.")
+        else:
+            linhas.append("Nenhuma pendência em aberto.")
+        if resolvidas:
+            linhas += ["", "Falhas resolvidas na semana (nova tentativa deu certo):"]
+            linhas += resolvidas[:MAX_PENDENCIAS]
+            if len(resolvidas) > MAX_PENDENCIAS:
+                linhas.append(f"  ... e mais {len(resolvidas) - MAX_PENDENCIAS} — veja a planilha anexa.")
         linhas.append("")
 
     if com_anexo:

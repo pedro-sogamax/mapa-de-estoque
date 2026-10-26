@@ -171,6 +171,29 @@ class TestTextoDoRelatorio:
         assert "pendência" not in assunto
         assert "Nenhuma falha na semana." in corpo
 
+    def test_falha_que_deu_certo_depois_nao_e_pendencia(self):
+        """26/10/2026: a CATARINENSE caiu no SMTP, saiu 19 s depois e o relatorio a deu como falha."""
+        eventos = [
+            {**historico.evento_envio("G", "CATARINENSE", "p", "email", "a@b", "falha", "conexao caiu"), "em": "2026-09-28T10:15:29"},
+            {**historico.evento_envio("G", "CATARINENSE", "p", "email", "a@b", "ok"), "em": "2026-09-28T10:15:48"},
+            {**historico.evento_envio("G", "BLAU", "p", "email", "c@d", "ok"), "em": "2026-09-28T10:15:00"},
+        ]
+        assunto, corpo = montar_relatorio(eventos, date(2026, 9, 22), SEGUNDA)
+        assert "pendência" not in assunto
+        assert "Envios:    2 ok, 0 falha(s), 0 não tentado(s) (2 no total)" in corpo
+        assert "Nenhuma pendência em aberto." in corpo
+        assert "CATARINENSE" in corpo and "resolvida em 28/09 10:15" in corpo
+
+    def test_falha_repetida_continua_pendencia(self):
+        eventos = [
+            {**historico.evento_envio("G", "BLAU", "p", "email", "a@b", "falha", "x"), "em": "2026-09-28T10:00:00"},
+            {**historico.evento_envio("G", "BLAU", "p", "email", "a@b", "falha", "y"), "em": "2026-09-28T11:00:00"},
+        ]
+        assunto, corpo = montar_relatorio(eventos, date(2026, 9, 22), SEGUNDA)
+        assert "2 pendência(s)" in assunto
+        assert "Envios:    0 ok, 1 falha(s)" in corpo
+        assert "resolvida" not in corpo
+
     def test_rodada_quebrada_entra_no_topo(self):
         _, corpo = montar_relatorio([], date(2026, 9, 22), SEGUNDA, erro_da_rodada="login recusado")
         assert "foi interrompida" in corpo and "login recusado" in corpo

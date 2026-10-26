@@ -8,6 +8,9 @@ antiga. O detalhe de cada uma está no histórico do git.
 - A tarefa agendada roda sem janela, pelo novo `executar-oculto.vbs`. Na primeira rodada real,
   a janela do cmd foi fechada no meio da extração e nada foi enviado; os 47 mapas da semana
   saíram à mão no mesmo dia.
+- O relatório da revisão semanal conta o desfecho de cada laboratório, e não cada tentativa:
+  uma falha que deu certo numa nova tentativa sai em "Falhas resolvidas na semana", e não
+  como pendência. A planilha anexa continua trazendo cada tentativa.
 
 ## 2026-10-23
 
